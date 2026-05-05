@@ -1,8 +1,8 @@
-import { useCallback, useRef } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Box, Typography, Button } from '@mui/material'
 import { styled } from '@mui/material/styles'
-import { GoogleMap, useJsApiLoader, Polyline, Marker } from '@react-google-maps/api'
+import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api'
 import { useVehicle } from '@/contexts/VehicleContext'
 import { ChevronDown, Bell, Zap, LocateFixed } from 'lucide-react'
 
@@ -34,7 +34,6 @@ const DEST_POSITION = ROUTE_PATH[ROUTE_PATH.length - 1]
 const MAP_CENTER    = { lat: 40.7550, lng: -73.9870 }
 
 const MAP_OPTIONS = { styles: DARK_MAP_STYLES, disableDefaultUI: true, gestureHandling: 'greedy', clickableIcons: false }
-const POLYLINE_OPTIONS = { strokeColor: '#C8FF00', strokeOpacity: 0.95, strokeWeight: 4, zIndex: 1 }
 
 const HomeRoot            = styled(Box)({ height: '100%', position: 'relative', backgroundColor: '#000' })
 const MapContainer        = styled(Box)({ position: 'absolute', inset: 0 })
@@ -43,16 +42,16 @@ const MapFallbackText     = styled(Typography)({ color: 'rgba(255,255,255,0.3)',
 const MapLoadingBox       = styled(Box)({ width: '100%', height: '100%', backgroundColor: '#0d0d14' })
 const TopGradient         = styled('div')({ position: 'absolute', top: 0, left: 0, right: 0, height: 140, zIndex: 2, background: 'linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, transparent 100%)', pointerEvents: 'none' })
 const HeaderShell         = styled('div')({ position: 'absolute', top: 16, left: 12, right: 12, zIndex: 30, background: 'rgba(10,12,20,0.96)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 20, padding: '10px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' })
-const MotionHeaderShell   = motion(HeaderShell)
+const MotionHeaderShell   = motion.create(HeaderShell)
 const VehicleRow          = styled(Box)({ display: 'flex', alignItems: 'center', gap: '5px' })
 const VehicleLabel        = styled(Typography)({ fontSize: 15, fontWeight: 800, letterSpacing: '-0.4px' })
 const DeviceSubtitle      = styled(Typography)({ color: 'rgba(255,255,255,0.26)', fontSize: 10, marginTop: '1px' })
 const HeaderRight         = styled(Box)({ display: 'flex', alignItems: 'center', gap: '8px' })
 const NotificationButton  = styled(Button)({ minWidth: 0, width: 30, height: 30, borderRadius: '50%', padding: 0, backgroundColor: 'rgba(255,255,255,0.07)' })
-const MotionNotifButton   = motion(NotificationButton)
+const MotionNotifButton   = motion.create(NotificationButton)
 const AvatarBadge         = styled(Box)({ width: 30, height: 30, borderRadius: '50%', background: 'linear-gradient(135deg, #C8FF00, #8FB800)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: '#000' })
 const TripCardShell       = styled('div')({ position: 'absolute', top: 80, left: 12, right: 12, zIndex: 20, background: 'rgba(12,15,22,0.90)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: 18, padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10 })
-const MotionTripCardShell = motion(TripCardShell)
+const MotionTripCardShell = motion.create(TripCardShell)
 const TripCardContent     = styled(Box)({ flex: 1 })
 const TripBadgeRow        = styled(Box)({ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' })
 const TripBadge           = styled(Box)({ backgroundColor: 'rgba(200,255,0,0.12)', border: '1px solid rgba(200,255,0,0.22)', borderRadius: '99px', padding: '2px 8px', display: 'flex', alignItems: 'center', gap: '4px' })
@@ -62,24 +61,45 @@ const TripDestRow         = styled(Box)({ display: 'flex', alignItems: 'center',
 const TripDestIcon        = styled(Box)({ width: 18, height: 18, borderRadius: '5px', backgroundColor: 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontWeight: 800, color: 'rgba(255,255,255,0.6)' })
 const TripDestText        = styled(Typography)({ color: 'rgba(255,255,255,0.40)', fontSize: 11 })
 const GoButton            = styled(Button)({ minWidth: 0, width: 42, height: 42, borderRadius: '13px', padding: 0, flexShrink: 0, fontSize: 12, fontWeight: 800 })
-const MotionGoButton      = motion(GoButton)
+const MotionGoButton      = motion.create(GoButton)
 const RecenterButton      = styled(Button)({ position: 'absolute', bottom: 90, right: 16, minWidth: 0, width: 36, height: 36, borderRadius: '50%', padding: 0, backgroundColor: 'rgba(12,15,22,0.88)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', zIndex: 30, boxShadow: '0 4px 14px rgba(0,0,0,0.5)' })
-const MotionRecenterButton = motion(RecenterButton)
+const MotionRecenterButton = motion.create(RecenterButton)
 
 const MapView = () => {
-  const mapRef = useRef<google.maps.Map | null>(null)
+  const mapRef      = useRef<google.maps.Map | null>(null)
+  const polylineRef = useRef<google.maps.Polyline | null>(null)
+  const [mapReady, setMapReady] = useState(false)
   const { isLoaded, loadError } = useJsApiLoader({ googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '' })
-  const onLoad = useCallback((map: google.maps.Map) => { mapRef.current = map }, [])
 
-  const carIcon  = isLoaded ? { path: google.maps.SymbolPath.CIRCLE, scale: 8, fillColor: '#C8FF00', fillOpacity: 1, strokeColor: '#000', strokeWeight: 2 } : null
-  const destIcon = isLoaded ? { path: google.maps.SymbolPath.CIRCLE, scale: 7, fillColor: '#fff', fillOpacity: 1, strokeColor: '#000', strokeWeight: 2 } : null
+  const onLoad = useCallback((map: google.maps.Map) => {
+    mapRef.current = map
+    // Create the polyline imperatively — avoids @react-google-maps/api remount bug
+    // where Polyline.componentDidMount fires before the new map instance is ready
+    polylineRef.current = new google.maps.Polyline({
+      path: ROUTE_PATH,
+      strokeColor: '#C8FF00',
+      strokeOpacity: 0.95,
+      strokeWeight: 4,
+      zIndex: 1,
+      map,
+    })
+    setMapReady(true)
+  }, [])
+
+  const onUnmount = useCallback(() => {
+    if (polylineRef.current) { polylineRef.current.setMap(null); polylineRef.current = null }
+    mapRef.current = null
+    setMapReady(false)
+  }, [])
+
+  const carIcon  = mapReady ? { path: google.maps.SymbolPath.CIRCLE, scale: 8, fillColor: '#C8FF00', fillOpacity: 1, strokeColor: '#000', strokeWeight: 2 } : null
+  const destIcon = mapReady ? { path: google.maps.SymbolPath.CIRCLE, scale: 7, fillColor: '#fff', fillOpacity: 1, strokeColor: '#000', strokeWeight: 2 } : null
 
   if (loadError) return <MapFallbackRoot><MapFallbackText>Map unavailable</MapFallbackText></MapFallbackRoot>
   if (!isLoaded) return <MapLoadingBox />
 
   return (
-    <GoogleMap mapContainerStyle={{ width: '100%', height: '100%' }} center={MAP_CENTER} zoom={14} options={MAP_OPTIONS} onLoad={onLoad}>
-      <Polyline path={ROUTE_PATH} options={POLYLINE_OPTIONS} />
+    <GoogleMap mapContainerStyle={{ width: '100%', height: '100%' }} center={MAP_CENTER} zoom={14} options={MAP_OPTIONS} onLoad={onLoad} onUnmount={onUnmount}>
       {carIcon  && <Marker position={CAR_POSITION}  icon={carIcon}  />}
       {destIcon && <Marker position={DEST_POSITION} icon={destIcon} />}
     </GoogleMap>

@@ -1,9 +1,13 @@
 import { createContext, useContext, useState } from 'react'
 import type { ReactNode, Dispatch, SetStateAction } from 'react'
 
+export type PlanTier = 'personal' | 'business' | 'fleet'
+
 export interface Plan {
+  tier:  PlanTier
   type:  'monthly' | 'annual'
   price: number
+  deviceOrdered: boolean
 }
 
 interface PlanContextType {

@@ -9,8 +9,8 @@ import PrimaryButton from '@/components/common/PrimaryButton'
 import Car3D from '@/components/common/Car3D'
 import { useVehicle } from '@/contexts/VehicleContext'
 
-const STEP = 2
-const TOTAL = 6
+const STEP = 5
+const TOTAL = 8
 
 const ScreenRoot   = styled(Box)({ height: '100%', display: 'flex', flexDirection: 'column', paddingTop: '16px', position: 'relative' })
 const ScrollArea   = styled(Box)({ flex: 1, padding: '16px 24px 0', overflowY: 'auto' })
@@ -20,7 +20,7 @@ const CarPreviewBox = styled(Box, { shouldForwardProp: p => p !== 'hasVehicle' }
 const VehicleInfoRow = styled(Box)({ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '12px', position: 'relative', zIndex: 1 })
 const VehicleNameText = styled(Typography)({ fontWeight: 700, fontSize: 15 })
 const FieldsColumn = styled('div')({ display: 'flex', flexDirection: 'column', gap: 14 })
-const MotionFieldsColumn = motion(FieldsColumn)
+const MotionFieldsColumn = motion.create(FieldsColumn)
 const VehicleModelCaption = styled(Typography)({ fontSize: 12 })
 const SetupBadge = styled(Box)({ backgroundColor: 'rgba(250,204,21,0.10)', border: '1px solid rgba(250,204,21,0.22)', borderRadius: '99px', padding: '4px 12px' })
 const SetupBadgeLabel = styled(Typography)({ color: '#facc15', fontSize: 11, fontWeight: 600 })

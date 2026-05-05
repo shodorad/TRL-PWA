@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@/contexts/AuthContext'
 import { motion } from 'framer-motion'
 import { Box, Typography } from '@mui/material'
 import { styled } from '@mui/material/styles'
@@ -44,13 +45,15 @@ const StatusChip = ({ label, color, dimColor }: { label: string; color: string; 
 
 const Success = () => {
   const navigate = useNavigate()
+  const { setToken } = useAuth()
   const { deviceReady } = useDevice()
   const { plan } = usePlan()
 
   const deviceLabel = deviceReady ? 'Device ready' : 'Device pending setup'
   const deviceColor = deviceReady ? '#4ade80' : '#facc15'
   const deviceDim   = deviceReady ? '74,222,128' : '250,204,21'
-  const planLabel   = plan ? `${plan.type === 'annual' ? 'Annual' : 'Monthly'} plan active` : 'Trial active'
+  const tierName    = plan?.tier ? plan.tier.charAt(0).toUpperCase() + plan.tier.slice(1) : ''
+  const planLabel   = plan ? `${tierName} ${plan.type === 'annual' ? 'Annual' : 'Monthly'} plan active` : 'Trial active'
   const planColor   = plan ? '#4ade80' : '#facc15'
   const planDim     = plan ? '74,222,128' : '250,204,21'
 
@@ -121,7 +124,11 @@ const Success = () => {
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
         <FooterArea>
-          <PrimaryButton onClick={() => navigate('/')} label="Open TrackLynk" />
+          <PrimaryButton onClick={() => {
+              localStorage.setItem('accessToken', 'user-token')
+              setToken('user-token')
+              navigate('/')
+            }} label="Open TrackLynk" />
         </FooterArea>
       </motion.div>
     </ScreenRoot>

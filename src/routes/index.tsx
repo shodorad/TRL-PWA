@@ -18,16 +18,22 @@ const load = (factory: () => Promise<{ default: React.ComponentType }>) => {
 export const router = createBrowserRouter([
   // ── Onboarding (public) ──────────────────────────────────
   { path: '/onboarding/welcome',              element: load(() => import('@/pages/onboarding/welcome')) },
+  { path: '/onboarding/choose-plan',          element: load(() => import('@/pages/onboarding/choose-plan')) },
+  { path: '/onboarding/select-device',        element: load(() => import('@/pages/onboarding/select-device')) },
+  { path: '/onboarding/payment',              element: load(() => import('@/pages/onboarding/payment')) },
   { path: '/onboarding/add-vehicle',          element: load(() => import('@/pages/onboarding/add-vehicle')) },
   { path: '/onboarding/vehicle-details',      element: load(() => import('@/pages/onboarding/vehicle-details')) },
   { path: '/onboarding/scan-device',          element: load(() => import('@/pages/onboarding/scan-device')) },
   { path: '/onboarding/device-setup-wizard',  element: load(() => import('@/pages/onboarding/device-setup-wizard')) },
-  { path: '/onboarding/choose-plan',          element: load(() => import('@/pages/onboarding/choose-plan')) },
+  { path: '/onboarding/device-tracking',      element: load(() => import('@/pages/onboarding/device-tracking')) },
   { path: '/onboarding/success',              element: load(() => import('@/pages/onboarding/success')) },
 
   // ── Auth (public) ────────────────────────────────────────
-  { path: '/auth/login',    element: load(() => import('@/pages/authentication/login')) },
-  { path: '/auth/sign-up',  element: load(() => import('@/pages/authentication/sign-up')) },
+  { path: '/auth/login',           element: load(() => import('@/pages/authentication/login')) },
+  { path: '/auth/sign-up',         element: load(() => import('@/pages/authentication/sign-up')) },
+  { path: '/auth/sign-in',         element: load(() => import('@/pages/authentication/sign-in')) },
+  { path: '/auth/forgot-password', element: load(() => import('@/pages/authentication/forgot-password')) },
+  { path: '/auth/verify-email',    element: load(() => import('@/pages/authentication/verify-email')) },
 
   // ── Protected app shell ───────────────────────────────────
   {
@@ -37,8 +43,10 @@ export const router = createBrowserRouter([
         path: '/',
         element: load(() => import('@/layout/MainLayout')),
         children: [
-          { index: true,        element: load(() => import('@/pages/home')) },
-          { path: 'trips',      element: load(() => import('@/pages/trips')) },
+          { index: true,           element: load(() => import('@/pages/home')) },
+          { path: 'trips',         element: load(() => import('@/pages/trips')) },
+          { path: 'trips/:id',     element: load(() => import('@/pages/trips/detail')) },
+          { path: 'health',        element: load(() => import('@/pages/health')) },
           {
             path: 'settings',
             children: [

@@ -8,10 +8,10 @@ import ProgressBar from '@/components/common/ProgressBar'
 import PrimaryButton from '@/components/common/PrimaryButton'
 import { useVehicle } from '@/contexts/VehicleContext'
 
-const STEP = 1
-const TOTAL = 6
+const STEP = 4
+const TOTAL = 8
 
-const MotionButton = motion(Button)
+const MotionButton = motion.create(Button)
 
 const ScreenRoot    = styled(Box)({ height: '100%', display: 'flex', flexDirection: 'column', paddingTop: '16px', position: 'relative' })
 const ContentArea   = styled(Box)({ flex: 1, padding: '16px 24px 0' })
@@ -27,7 +27,7 @@ const VinCounterText = styled(Typography, { shouldForwardProp: p => p !== 'valid
 const MatchBadge    = styled(Box)({ display: 'flex', alignItems: 'center', gap: '9px', marginTop: '10px', padding: '10px 14px', borderRadius: '13px', backgroundColor: 'rgba(74,222,128,0.08)', border: '1px solid rgba(74,222,128,0.2)' })
 const MatchDot      = styled(Box)({ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#4ade80', boxShadow: '0 0 6px rgba(74,222,128,0.6)', flexShrink: 0 })
 const SpinnerShell  = styled('div')({ width: 22, height: 22, border: '2.5px solid #C8FF00', borderTopColor: 'transparent', borderRadius: '50%' })
-const MotionSpinner = motion(SpinnerShell)
+const MotionSpinner = motion.create(SpinnerShell)
 const MatchText     = styled(Typography)({ color: '#4ade80', fontSize: 13, fontWeight: 600 })
 const HintCard      = styled(Box)({ display: 'flex', gap: '10px', marginTop: '18px', padding: '14px', borderRadius: '15px', backgroundColor: 'rgba(255,255,255,0.04)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.07)' })
 const HintText      = styled(Typography)({ fontSize: 12.5, lineHeight: 1.65 })

@@ -9,11 +9,11 @@ import PrimaryButton from '@/components/common/PrimaryButton'
 import { glassCard } from '@/styles/glass'
 import { useDevice } from '@/contexts/DeviceContext'
 
-const STEP = 4
-const TOTAL = 6
+const STEP = 7
+const TOTAL = 8
 const IS_DEV = import.meta.env.DEV
 
-const MotionButton = motion(Button)
+const MotionButton = motion.create(Button)
 
 const WizardRoot        = styled(Box)({ height: '100%', display: 'flex', flexDirection: 'column', paddingTop: '16px', position: 'relative' })
 const SkipRow           = styled(Box)({ display: 'flex', justifyContent: 'flex-end', padding: '0 24px 4px' })
@@ -173,7 +173,7 @@ const DeviceSetupWizard = () => {
       setDir(1); setStepDone(false); setWizardStep(s => s + 1)
     } else {
       setDeviceReady(true)
-      navigate('/onboarding/choose-plan')
+      navigate('/onboarding/device-tracking')
     }
   }
 
@@ -183,7 +183,7 @@ const DeviceSetupWizard = () => {
   }
 
   const handleSkip = () => {
-    if (window.confirm("Skip the setup guide? Your device won't be configured until you complete this step.")) navigate('/onboarding/choose-plan')
+    if (window.confirm("Skip the setup guide? Your device won't be configured until you complete this step.")) navigate('/onboarding/device-tracking')
   }
 
   const { title, subtitle, Visual, cta } = WIZARD_STEPS[wizardStep]

@@ -6,7 +6,7 @@ import { styled } from '@mui/material/styles'
 import { Fingerprint, Check, ArrowLeft } from 'lucide-react'
 import { glassCard } from '@/styles/glass'
 
-const MotionButton = motion(Button)
+const MotionButton = motion.create(Button)
 
 // ── Styled ──────────────────────────────────────────────────
 const AuthRoot = styled(Box)({ height: '100%', display: 'flex', flexDirection: 'column', paddingTop: '16px' })
@@ -120,7 +120,7 @@ const Login = () => {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.28 }}>
           <SignInRow>
             <SignInPromptText variant="caption">Already have an account?</SignInPromptText>
-            <SignInLink variant="text" whileTap={{ scale: 0.95 }} onClick={() => navigate('/auth/sign-up')}>Sign in</SignInLink>
+            <SignInLink variant="text" whileTap={{ scale: 0.95 }} onClick={() => navigate('/auth/sign-in')}>Sign in</SignInLink>
           </SignInRow>
         </motion.div>
 

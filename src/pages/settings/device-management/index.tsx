@@ -6,7 +6,7 @@ import { ArrowLeft, Cpu, Wifi, RotateCcw, Trash2 } from 'lucide-react'
 import { useDevice } from '@/contexts/DeviceContext'
 import { GlassCard } from '@/components/common/GlassCard'
 
-const MotionButton = motion(Button)
+const MotionButton = motion.create(Button)
 const ScreenRoot   = styled(Box)({ height: '100%', display: 'flex', flexDirection: 'column', paddingTop: '16px' })
 const Header       = styled(Box)({ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 20px 16px' })
 const BackBtn      = styled(MotionButton)({ minWidth: 0, width: 40, height: 40, borderRadius: '12px', padding: 0, background: 'rgba(255,255,255,0.07)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' })
@@ -61,8 +61,8 @@ const DeviceManagement = () => {
           <GlassCard sx={{ p: '20px', textAlign: 'center' }}>
             <Wifi size={32} color="rgba(255,255,255,0.25)" style={{ marginBottom: 12 }} />
             <Typography sx={{ fontSize: 14, color: 'rgba(255,255,255,0.45)' }}>No device connected</Typography>
-            <MotionButton variant="outlined" whileTap={{ scale: 0.97 }} onClick={() => navigate('/onboarding/scan-device')} sx={{ mt: 2, borderRadius: '12px' }}>
-              Scan Device
+            <MotionButton variant="outlined" whileTap={{ scale: 0.97 }} onClick={() => navigate('/onboarding/device-setup-wizard')} sx={{ mt: 2, borderRadius: '12px' }}>
+              Set Up Device
             </MotionButton>
           </GlassCard>
         )}

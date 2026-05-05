@@ -5,7 +5,7 @@ import { styled } from '@mui/material/styles'
 import { ArrowLeft, FileText, Shield, ExternalLink } from 'lucide-react'
 import { GlassCard } from '@/components/common/GlassCard'
 
-const MotionButton = motion(Button)
+const MotionButton = motion.create(Button)
 const ScreenRoot   = styled(Box)({ height: '100%', display: 'flex', flexDirection: 'column', paddingTop: '16px' })
 const Header       = styled(Box)({ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 20px 16px' })
 const BackBtn      = styled(MotionButton)({ minWidth: 0, width: 40, height: 40, borderRadius: '12px', padding: 0, background: 'rgba(255,255,255,0.07)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' })

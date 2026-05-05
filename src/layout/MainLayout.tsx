@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { styled } from '@mui/material/styles'
 import { Box } from '@mui/material'
-import { MapPin, Route, User, Settings, MessageSquare } from 'lucide-react'
+import { MapPin, Route, HeartPulse, Settings, MessageSquare } from 'lucide-react'
 import ConversationalPanel from './ConversationalPanel'
 
 // ─── Styled ──────────────────────────────────────────────────────────────────
@@ -55,7 +55,7 @@ const TabButtonBase = styled('button')({
   cursor: 'pointer',
 })
 
-const MotionTabButton = motion(TabButtonBase)
+const MotionTabButton = motion.create(TabButtonBase)
 
 const ActiveIndicatorBase = styled('div')({
   position: 'absolute',
@@ -65,7 +65,7 @@ const ActiveIndicatorBase = styled('div')({
   border: '1px solid rgba(200,255,0,0.18)',
 })
 
-const MotionActiveIndicator = motion(ActiveIndicatorBase)
+const MotionActiveIndicator = motion.create(ActiveIndicatorBase)
 
 const TabLabel = styled('span')({
   fontSize: 9.5,
@@ -75,28 +75,6 @@ const TabLabel = styled('span')({
   zIndex: 1,
 })
 
-const ToastPopupBase = styled('div')({
-  position: 'absolute',
-  bottom: 70,
-  left: '50%',
-  transform: 'translateX(-50%)',
-  background: 'rgba(18,22,32,0.95)',
-  backdropFilter: 'blur(16px)',
-  WebkitBackdropFilter: 'blur(16px)',
-  border: '1px solid rgba(255,255,255,0.10)',
-  borderRadius: 12,
-  padding: '8px 16px',
-  whiteSpace: 'nowrap',
-})
-
-const MotionToastPopup = motion(ToastPopupBase)
-
-const ToastText = styled('span')({
-  color: 'rgba(255,255,255,0.70)',
-  fontSize: 13,
-  fontFamily: 'Inter, sans-serif',
-  fontWeight: 500,
-})
 
 // ─── Nav config ───────────────────────────────────────────────────────────────
 
@@ -105,44 +83,34 @@ const LEFT_TABS  = [
   { id: 'trips', label: 'Trips', path: '/trips', Icon: Route   },
 ]
 const RIGHT_TABS = [
-  { id: 'profile',  label: 'Profile',  path: '',          Icon: User,     disabled: true },
-  { id: 'settings', label: 'Settings', path: '/settings', Icon: Settings  },
+  { id: 'health',   label: 'Health',   path: '/health',   Icon: HeartPulse },
+  { id: 'settings', label: 'Settings', path: '/settings', Icon: Settings   },
 ]
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 const MainLayout = () => {
-  const navigate     = useNavigate()
-  const location     = useLocation()
+  const navigate  = useNavigate()
+  const location  = useLocation()
   const [chatOpen, setChatOpen] = useState(false)
-  const [toast,    setToast]    = useState(false)
 
   const currentId = location.pathname === '/'
     ? 'home'
     : location.pathname.startsWith('/trips')    ? 'trips'
+    : location.pathname.startsWith('/health')   ? 'health'
     : location.pathname.startsWith('/settings') ? 'settings'
     : 'home'
 
-  const handleProfileTap = () => {
-    setToast(true)
-    setTimeout(() => setToast(false), 2000)
-  }
-
-  const renderTab = ({ id, label, path, Icon, disabled = false }: typeof LEFT_TABS[0] & { disabled?: boolean }) => {
+  const renderTab = ({ id, label, path, Icon }: typeof LEFT_TABS[0]) => {
     const isActive = currentId === id || (id === 'chat' && chatOpen)
-    const color    = disabled
-      ? 'rgba(255,255,255,0.18)'
-      : isActive ? '#C8FF00' : 'rgba(255,255,255,0.45)'
+    const color    = isActive ? '#C8FF00' : 'rgba(255,255,255,0.45)'
 
     return (
       <MotionTabButton
         key={id}
-        whileTap={!disabled ? { scale: 0.88 } : {}}
-        onClick={() => {
-          if (disabled) { handleProfileTap(); return }
-          navigate(path)
-        }}
-        style={{ cursor: disabled ? 'default' : 'pointer' }}
+        whileTap={{ scale: 0.88 }}
+        onClick={() => navigate(path)}
+        style={{ cursor: 'pointer' }}
       >
         {isActive && (
           <MotionActiveIndicator
@@ -162,14 +130,6 @@ const MainLayout = () => {
         <Outlet />
 
         <TabBarWrapper>
-          <AnimatePresence>
-            {toast && (
-              <MotionToastPopup initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}>
-                <ToastText>Profile coming soon</ToastText>
-              </MotionToastPopup>
-            )}
-          </AnimatePresence>
-
           <TabBar>
             {LEFT_TABS.map(tab => renderTab(tab))}
 

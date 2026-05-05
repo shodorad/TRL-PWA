@@ -9,10 +9,10 @@ import PrimaryButton from '@/components/common/PrimaryButton'
 import { glassCard } from '@/styles/glass'
 import { useDevice } from '@/contexts/DeviceContext'
 
-const STEP = 3
-const TOTAL = 6
+const STEP = 6
+const TOTAL = 8
 
-const MotionButton = motion(Button)
+const MotionButton = motion.create(Button)
 
 const ScreenRoot    = styled(Box)({ height: '100%', display: 'flex', flexDirection: 'column', paddingTop: '16px', position: 'relative' })
 const ContentArea   = styled(Box)({ flex: 1, padding: '16px 24px 0', display: 'flex', flexDirection: 'column' })
@@ -21,18 +21,18 @@ const SubText       = styled(Typography)({ fontSize: 14, marginBottom: '24px' })
 const DeviceVisualWrapper = styled('div')({ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, justifyContent: 'center', gap: 24 })
 const DevicePositioner = styled(Box)({ position: 'relative' })
 const GlowRingBase  = styled('div')({ position: 'absolute', inset: -12, borderRadius: 30, border: '1px solid rgba(200,255,0,0.25)', pointerEvents: 'none' })
-const MotionGlowRing = motion(GlowRingBase)
+const MotionGlowRing = motion.create(GlowRingBase)
 const OBDCard       = styled(Box)({ ...glassCard, width: 160, height: 110, borderRadius: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '10px', position: 'relative', overflow: 'hidden' })
 const DeviceLabel   = styled(Typography)({ position: 'absolute', top: 10, left: 12, right: 12, color: 'rgba(255,255,255,0.25)', fontSize: 9, letterSpacing: '1px', textTransform: 'uppercase', fontFamily: 'monospace', textAlign: 'center' })
 const BarcodeRow    = styled(Box)({ display: 'flex', gap: '2.5px', alignItems: 'center', marginTop: '10px' })
 const BarcodeBar    = styled(Box)<{ barheight: number }>(({ barheight }) => ({ width: 2, height: barheight * 2.8, backgroundColor: 'rgba(255,255,255,0.65)', borderRadius: '1px' }))
 const BarcodeSerial = styled(Typography)({ color: 'rgba(255,255,255,0.35)', fontSize: 8, letterSpacing: '1.5px', fontFamily: 'monospace' })
 const ScanLineBase  = styled('div')({ position: 'absolute', left: 8, right: 8, height: 1.5, background: 'linear-gradient(90deg, transparent, #C8FF00 30%, #C8FF00 70%, transparent)', borderRadius: 99, boxShadow: '0 0 6px rgba(200,255,0,0.7)' })
-const MotionScanLine = motion(ScanLineBase)
+const MotionScanLine = motion.create(ScanLineBase)
 const StatusLEDBase = styled('div')({ position: 'absolute', top: 10, right: 12, width: 7, height: 7, borderRadius: '50%' })
-const MotionStatusLED = motion(StatusLEDBase)
+const MotionStatusLED = motion.create(StatusLEDBase)
 const SuccessBadgeBase = styled('div')({ position: 'absolute', top: -10, right: -10, width: 34, height: 34, borderRadius: '50%', background: 'linear-gradient(135deg, #22c55e, #16a34a)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(74,222,128,0.4)' })
-const MotionSuccessBadge = motion(SuccessBadgeBase)
+const MotionSuccessBadge = motion.create(SuccessBadgeBase)
 const ValidatedBox  = styled(Box)({ textAlign: 'center', padding: '16px 24px', borderRadius: '18px', backgroundColor: 'rgba(74,222,128,0.08)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(74,222,128,0.2)' })
 const ValidatedTitle = styled(Typography)({ color: '#4ade80', fontWeight: 700, fontSize: 16 })
 const ValidatedImei = styled(Typography)({ fontSize: 12.5, marginTop: '4px', display: 'block' })

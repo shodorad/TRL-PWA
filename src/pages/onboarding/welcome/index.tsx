@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@/contexts/AuthContext'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Box } from '@mui/material'
 import { MapPin, Shield, Zap, Check } from 'lucide-react'
@@ -137,6 +138,7 @@ const PricingSlide = () => {
 
 const Welcome = () => {
   const navigate  = useNavigate()
+  const { setToken } = useAuth()
   const [slide, setSlide] = useState(0)
   const [dir, setDir]     = useState(1)
   const timerRef          = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -193,7 +195,11 @@ const Welcome = () => {
           </GetStartedButton>
         </motion.div>
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.26 }}>
-          <ExploreButton fullWidth variant="outlined" whileTap={{ scale: 0.97 }} onClick={() => navigate('/')}>
+          <ExploreButton fullWidth variant="outlined" whileTap={{ scale: 0.97 }} onClick={() => {
+            localStorage.setItem('accessToken', 'demo-token')
+            setToken('demo-token')
+            navigate('/')
+          }}>
             Explore the app (skip onboarding) →
           </ExploreButton>
         </motion.div>

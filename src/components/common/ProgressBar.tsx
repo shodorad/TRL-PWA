@@ -3,7 +3,7 @@ import { Box, Typography, Button } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { ArrowLeft } from 'lucide-react'
 
-const MotionButton = motion(Button)
+const MotionButton = motion.create(Button)
 
 const BackButtonStyled = styled(MotionButton)({
   minWidth: 0,

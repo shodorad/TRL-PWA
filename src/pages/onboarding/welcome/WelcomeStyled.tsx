@@ -2,7 +2,7 @@ import { motion } from 'framer-motion'
 import { Box, Typography, Button, Divider } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
-const MotionButton = motion(Button)
+const MotionButton = motion.create(Button)
 
 export const WelcomeRoot = styled(Box)({ height: '100%', display: 'flex', flexDirection: 'column', paddingTop: '16px' })
 export const CarouselWrapper = styled(Box)({ flex: 1, position: 'relative', overflow: 'hidden' })

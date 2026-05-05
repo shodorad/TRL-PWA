@@ -7,7 +7,7 @@ import {
   Mic, Send, BatteryMedium, Cpu, History, X,
 } from 'lucide-react'
 
-const MotionButton = motion(Button)
+const MotionButton = motion.create(Button)
 
 const PanelShell = styled('div')({
   height: '100%',

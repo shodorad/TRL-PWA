@@ -2,7 +2,7 @@ import { motion } from 'framer-motion'
 import { Button } from '@mui/material'
 import { styled } from '@mui/material/styles'
 
-const MotionButton = motion(Button)
+const MotionButton = motion.create(Button)
 
 const PrimaryMotionButton = styled(MotionButton)({
   height: 54,

@@ -7,7 +7,7 @@ import { ArrowLeft, User, Mail, Phone, Lock, LogOut, Fingerprint } from 'lucide-
 import { useAuth } from '@/contexts/AuthContext'
 import { GlassCard } from '@/components/common/GlassCard'
 
-const MotionButton = motion(Button)
+const MotionButton = motion.create(Button)
 
 const ScreenRoot    = styled(Box)({ height: '100%', display: 'flex', flexDirection: 'column', paddingTop: '16px' })
 const Header        = styled(Box)({ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 20px 16px' })

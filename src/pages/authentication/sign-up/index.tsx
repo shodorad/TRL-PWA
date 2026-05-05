@@ -11,7 +11,7 @@ import { useAuth } from '@/contexts/AuthContext'
 const STEP = 0
 const TOTAL = 6
 
-const MotionButton = motion(Button)
+const MotionButton = motion.create(Button)
 
 const ScreenRoot = styled(Box)({ height: '100%', display: 'flex', flexDirection: 'column', paddingTop: '44px', position: 'relative' })
 const ScrollArea = styled(Box)({ flex: 1, overflowY: 'auto', padding: '20px 24px 0' })
@@ -26,7 +26,7 @@ const FieldLabelText = styled(Typography)({ color: 'rgba(255,255,255,0.48)', fon
 const FieldRoot = styled(Box)({ flex: 1 })
 const FieldErrorText = styled(Typography)({ color: 'rgba(255,80,80,0.9)', fontSize: 11.5, marginTop: '5px' })
 const FormFieldsColumn = styled('div')({ display: 'flex', flexDirection: 'column', gap: 12 })
-const MotionFormFieldsColumn = motion(FormFieldsColumn)
+const MotionFormFieldsColumn = motion.create(FormFieldsColumn)
 const PasswordIconButton = styled(IconButton)({ marginRight: '-8px' })
 
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -67,7 +67,7 @@ const SignUp = () => {
   const handleNext = () => {
     if (!isValid) return
     setUser({ firstName: form.first, lastName: form.last, phone: form.phone, email: form.email })
-    navigate('/onboarding/add-vehicle')
+    navigate('/auth/verify-email')
   }
 
   const touch = (key: string) => setTouched(t => ({ ...t, [key]: true }))
