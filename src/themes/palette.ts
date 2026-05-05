@@ -1,0 +1,6 @@
+export const PRIMARY_LIME   = '#C8FF00'
+export const PRIMARY_OLIVE  = '#8FB800'
+export const SECONDARY_GREEN = '#4ade80'
+export const WARNING_YELLOW  = '#facc15'
+export const BG_DARK         = '#04050d'
+export const SURFACE_DARK    = '#0d0d14'

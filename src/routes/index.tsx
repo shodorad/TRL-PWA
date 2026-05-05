@@ -1,0 +1,63 @@
+import { createBrowserRouter, Navigate } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
+import ProtectedRoute from './ProtectedRoute'
+
+const Spinner = () => (
+  <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#04050d' }} />
+)
+
+const load = (factory: () => Promise<{ default: React.ComponentType }>) => {
+  const Component = lazy(factory)
+  return (
+    <Suspense fallback={<Spinner />}>
+      <Component />
+    </Suspense>
+  )
+}
+
+export const router = createBrowserRouter([
+  // ── Onboarding (public) ──────────────────────────────────
+  { path: '/onboarding/welcome',              element: load(() => import('@/pages/onboarding/welcome')) },
+  { path: '/onboarding/add-vehicle',          element: load(() => import('@/pages/onboarding/add-vehicle')) },
+  { path: '/onboarding/vehicle-details',      element: load(() => import('@/pages/onboarding/vehicle-details')) },
+  { path: '/onboarding/scan-device',          element: load(() => import('@/pages/onboarding/scan-device')) },
+  { path: '/onboarding/device-setup-wizard',  element: load(() => import('@/pages/onboarding/device-setup-wizard')) },
+  { path: '/onboarding/choose-plan',          element: load(() => import('@/pages/onboarding/choose-plan')) },
+  { path: '/onboarding/success',              element: load(() => import('@/pages/onboarding/success')) },
+
+  // ── Auth (public) ────────────────────────────────────────
+  { path: '/auth/login',    element: load(() => import('@/pages/authentication/login')) },
+  { path: '/auth/sign-up',  element: load(() => import('@/pages/authentication/sign-up')) },
+
+  // ── Protected app shell ───────────────────────────────────
+  {
+    element: <ProtectedRoute />,
+    children: [
+      {
+        path: '/',
+        element: load(() => import('@/layout/MainLayout')),
+        children: [
+          { index: true,        element: load(() => import('@/pages/home')) },
+          { path: 'trips',      element: load(() => import('@/pages/trips')) },
+          {
+            path: 'settings',
+            children: [
+              { index: true,                   element: <Navigate to="account" replace /> },
+              { path: 'account',               element: load(() => import('@/pages/settings/account')) },
+              { path: 'vehicles',              element: load(() => import('@/pages/settings/vehicles')) },
+              { path: 'alerts',                element: load(() => import('@/pages/settings/alerts')) },
+              { path: 'device-management',     element: load(() => import('@/pages/settings/device-management')) },
+              { path: 'payment',               element: load(() => import('@/pages/settings/payment')) },
+              { path: 'legal',                 element: load(() => import('@/pages/settings/legal')) },
+              { path: 'support',               element: load(() => import('@/pages/settings/support')) },
+              { path: 'about',                 element: load(() => import('@/pages/settings/about')) },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── Catch-all ────────────────────────────────────────────
+  { path: '*', element: <Navigate to="/onboarding/welcome" replace /> },
+])
