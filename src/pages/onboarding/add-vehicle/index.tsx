@@ -8,8 +8,8 @@ import ProgressBar from '@/components/common/ProgressBar'
 import PrimaryButton from '@/components/common/PrimaryButton'
 import { useVehicle } from '@/contexts/VehicleContext'
 
-const STEP = 4
-const TOTAL = 8
+const STEP = 6
+const TOTAL = 10
 
 const MotionButton = motion.create(Button)
 

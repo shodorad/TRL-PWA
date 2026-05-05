@@ -9,8 +9,8 @@ import PrimaryButton from '@/components/common/PrimaryButton'
 import { glassCard } from '@/styles/glass'
 import { useDevice } from '@/contexts/DeviceContext'
 
-const STEP = 7
-const TOTAL = 8
+const STEP = 9
+const TOTAL = 10
 const IS_DEV = import.meta.env.DEV
 
 const MotionButton = motion.create(Button)

@@ -9,8 +9,8 @@ import PrimaryButton from '@/components/common/PrimaryButton'
 import Car3D from '@/components/common/Car3D'
 import { useVehicle } from '@/contexts/VehicleContext'
 
-const STEP = 5
-const TOTAL = 8
+const STEP = 7
+const TOTAL = 10
 
 const ScreenRoot   = styled(Box)({ height: '100%', display: 'flex', flexDirection: 'column', paddingTop: '16px', position: 'relative' })
 const ScrollArea   = styled(Box)({ flex: 1, padding: '16px 24px 0', overflowY: 'auto' })

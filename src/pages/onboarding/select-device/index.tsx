@@ -10,7 +10,7 @@ import { glassCard } from '@/styles/glass'
 import { usePlan } from '@/contexts/PlanContext'
 
 const STEP = 2
-const TOTAL = 8
+const TOTAL = 10
 
 type DeviceOption = 'buy' | 'have'
 

@@ -11,7 +11,7 @@ import { usePlan } from '@/contexts/PlanContext'
 import type { PlanTier } from '@/contexts/PlanContext'
 
 const STEP = 1
-const TOTAL = 8
+const TOTAL = 10
 
 // ── Pricing ──────────────────────────────────────────────────
 const PLANS: {
