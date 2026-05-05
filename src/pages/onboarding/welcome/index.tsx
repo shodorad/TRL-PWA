@@ -204,7 +204,7 @@ const Welcome = () => {
           </ExploreButton>
         </motion.div>
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.32 }}>
-          <SignInButton fullWidth variant="text" whileTap={{ scale: 0.97 }} onClick={() => navigate('/auth/login')}>
+          <SignInButton fullWidth variant="text" whileTap={{ scale: 0.97 }} onClick={() => navigate('/auth/sign-in')}>
             Already have an account? <SignInHighlight component="span">Sign In</SignInHighlight>
           </SignInButton>
         </motion.div>
