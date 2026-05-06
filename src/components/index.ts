@@ -28,6 +28,8 @@ export type { ToastVariant } from './feedback/Toast'
 export { default as SkeletonCard } from './feedback/SkeletonCard'
 export { default as EmptyState } from './feedback/EmptyState'
 export { default as ErrorState } from './feedback/ErrorState'
+export { default as NotificationBanner } from './feedback/NotificationBanner'
+export type { NotificationBannerProps, BannerVariant } from './feedback/NotificationBanner'
 
 // Data display
 export { default as StatCard } from './data/StatCard'
