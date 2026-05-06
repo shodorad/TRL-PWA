@@ -5,8 +5,9 @@ import { Box, Typography, Button, TextField, InputAdornment, IconButton } from '
 import { styled } from '@mui/material/styles'
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react'
 import PrimaryButton from '@/components/common/PrimaryButton'
-import { loginUser } from '@/services/authService'
+import { loginUser, googleLogin } from '@/services/authService'
 import { useAuth } from '@/contexts/AuthContext'
+import { GoogleLogin } from '@react-oauth/google'
 
 const MotionButton = motion.create(Button)
 
@@ -121,8 +122,10 @@ const SignIn = () => {
     try {
       const data = await loginUser({ email, password })
       const accessToken = data?.data?.accessToken ?? data?.accessToken ?? data?.token
+      const refreshToken = data?.data?.refreshToken ?? data?.refreshToken
       if (!accessToken) throw 'Invalid response from server.'
       localStorage.setItem('accessToken', accessToken)
+      if (refreshToken) localStorage.setItem('refreshToken', refreshToken)
       setToken(accessToken)
       if (data?.user) setUser(data.user)
       navigate('/')
@@ -130,6 +133,28 @@ const SignIn = () => {
       setSubmitError(typeof err === 'string' ? err : 'Sign in failed. Please try again.')
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  const handleGoogleSuccess = async (credentialResponse: { credential?: string }) => {
+    const idToken = credentialResponse.credential
+    if (!idToken) {
+      setSubmitError('Google sign-in failed. Please try again.')
+      return
+    }
+    setSubmitError(null)
+    try {
+      const data = await googleLogin({ idToken })
+      const accessToken = data?.data?.accessToken ?? data?.accessToken ?? data?.token
+      const refreshToken = data?.data?.refreshToken ?? data?.refreshToken
+      if (!accessToken) throw 'Invalid response from server.'
+      localStorage.setItem('accessToken', accessToken)
+      if (refreshToken) localStorage.setItem('refreshToken', refreshToken)
+      setToken(accessToken)
+      if (data?.user) setUser(data.user)
+      navigate('/')
+    } catch (err: any) {
+      setSubmitError(typeof err === 'string' ? err : 'Google sign-in failed. Please try again.')
     }
   }
 
@@ -207,9 +232,18 @@ const SignIn = () => {
               <OAuthAppleButton fullWidth variant="contained" whileTap={{ scale: 0.97 }} onClick={() => navigate('/')}>
                 <AppleIcon /> Continue with Apple
               </OAuthAppleButton>
-              <OAuthGoogleButton fullWidth variant="outlined" whileTap={{ scale: 0.97 }} onClick={() => navigate('/')} sx={{ color: 'text.primary' }}>
-                <GoogleIcon /> Continue with Google
-              </OAuthGoogleButton>
+              <Box sx={{ position: 'relative' }}>
+                <OAuthGoogleButton fullWidth variant="outlined" whileTap={{ scale: 0.97 }} sx={{ color: 'text.primary' }}>
+                  <GoogleIcon /> Continue with Google
+                </OAuthGoogleButton>
+                <Box sx={{ position: 'absolute', inset: 0, opacity: 0, '& > div, & iframe': { width: '100% !important', height: '100% !important' } }}>
+                  <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={() => setSubmitError('Google sign-in failed. Please try again.')}
+                    width="400"
+                  />
+                </Box>
+              </Box>
             </SSOGroup>
 
             <SignUpRow>

@@ -1,6 +1,7 @@
 import { CssBaseline, ThemeProvider } from '@mui/material'
 import { StyleSheetManager } from 'styled-components'
 import { RouterProvider } from 'react-router-dom'
+import { GoogleOAuthProvider } from '@react-oauth/google'
 import theme from '@/themes'
 import { router } from '@/routes'
 import { AuthProvider } from '@/contexts/AuthContext'
@@ -10,21 +11,23 @@ import { PlanProvider } from '@/contexts/PlanContext'
 import { globalStyles } from '@/styles/globals'
 
 const App = () => (
-  <StyleSheetManager>
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <style>{globalStyles}</style>
-      <AuthProvider>
-        <VehicleProvider>
-          <DeviceProvider>
-            <PlanProvider>
-              <RouterProvider router={router} />
-            </PlanProvider>
-          </DeviceProvider>
-        </VehicleProvider>
-      </AuthProvider>
-    </ThemeProvider>
-  </StyleSheetManager>
+  <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+    <StyleSheetManager>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <style>{globalStyles}</style>
+        <AuthProvider>
+          <VehicleProvider>
+            <DeviceProvider>
+              <PlanProvider>
+                <RouterProvider router={router} />
+              </PlanProvider>
+            </DeviceProvider>
+          </VehicleProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </StyleSheetManager>
+  </GoogleOAuthProvider>
 )
 
 export default App

@@ -10,6 +10,7 @@ import {
   Copy, CheckCircle2, Check, X,
 } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
+import { logoutUser } from '@/services/authService'
 import { GlassCard } from '@/components/common/GlassCard'
 import { SectionLabel, PageHeader, Avatar, AppToggle, DangerButton, ListRow } from '@/components'
 
@@ -458,9 +459,16 @@ const Account = () => {
   const [email, setEmail] = useState(user.email || 'user@tracklynk.com')
   const [phone, setPhone] = useState(user.phone || '+1 (555) 000-0000')
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const refreshToken = localStorage.getItem('refreshToken')
+    try {
+      if (refreshToken) await logoutUser({ refreshToken })
+    } catch {
+      // proceed with local cleanup even if server call fails
+    }
     setToken(null)
     localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
     navigate('/onboarding/welcome')
   }
 

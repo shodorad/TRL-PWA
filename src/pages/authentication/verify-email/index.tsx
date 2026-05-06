@@ -5,6 +5,7 @@ import { Box, Typography, Button } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { ArrowLeft, Mail } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
+import { validateVerificationCode, resendVerificationCode } from '@/services/authService'
 
 const MotionButton = motion.create(Button)
 
@@ -104,6 +105,8 @@ const VerifyEmail = () => {
   const { user }          = useAuth()
   const [digits, setDigits] = useState<string[]>(Array(OTP_LENGTH).fill(''))
   const [cooldown, setCooldown] = useState(COOLDOWN_SECS)
+  const [verifying, setVerifying] = useState(false)
+  const [verifyError, setVerifyError] = useState<string | null>(null)
   const inputRefs         = useRef<(HTMLInputElement | null)[]>([])
   const timerRef          = useRef<ReturnType<typeof setInterval> | null>(null)
 
@@ -129,11 +132,23 @@ const VerifyEmail = () => {
     }, 1000)
   }
 
-  const submit = useCallback((code: string[]) => {
-    if (code.every(d => d !== '')) {
-      navigate('/onboarding/choose-plan')
+  const submit = useCallback(async (code: string[]) => {
+    if (!code.every(d => d !== '') || verifying) return
+    if (!user.email) {
+      setVerifyError('Missing email — please sign up again.')
+      return
     }
-  }, [navigate])
+    setVerifying(true)
+    setVerifyError(null)
+    try {
+      await validateVerificationCode(user.email, code.join(''))
+      navigate('/onboarding/choose-plan')
+    } catch (err: any) {
+      setVerifyError(typeof err === 'string' ? err : 'Verification failed. Please try again.')
+    } finally {
+      setVerifying(false)
+    }
+  }, [navigate, user.email, verifying])
 
   const handleChange = (index: number, value: string) => {
     const char = value.replace(/\D/g, '').slice(-1)
@@ -208,6 +223,12 @@ const VerifyEmail = () => {
               ))}
             </OTPRow>
 
+            {verifyError && (
+              <Typography sx={{ color: 'rgba(255,80,80,0.9)', fontSize: 12, textAlign: 'center', mb: 2 }}>
+                {verifyError}
+              </Typography>
+            )}
+
             <ResendRow>
               <ResendText variant="caption">Didn't receive it?</ResendText>
               {cooldown > 0 ? (
@@ -216,9 +237,14 @@ const VerifyEmail = () => {
                 <ResendLink
                   variant="text"
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => {
+                  onClick={async () => {
                     setDigits(Array(OTP_LENGTH).fill(''))
                     inputRefs.current[0]?.focus()
+                    setVerifyError(null)
+                    if (user.email) {
+                      try { await resendVerificationCode(user.email) }
+                      catch (err: any) { setVerifyError(typeof err === 'string' ? err : 'Could not resend the code.') }
+                    }
                     resetCooldown()
                   }}
                 >

@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Box, Typography, Button, TextField, InputAdornment, IconButton } from '@mui/material'
+import { Box, Typography, Button, TextField, InputAdornment, IconButton, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react'
 import PrimaryButton from '@/components/common/PrimaryButton'
 import { useAuth } from '@/contexts/AuthContext'
+import { googleRegistration, registerUser } from '@/services/authService'
+import { GoogleLogin } from '@react-oauth/google'
 
 const MotionButton = motion.create(Button)
 
@@ -103,10 +105,15 @@ const Field = ({ label, value, onChange, placeholder, type = 'text', onBlur, err
 
 const SignUp = () => {
   const navigate = useNavigate()
-  const { setUser } = useAuth()
+  const { setUser, setToken } = useAuth()
   const [showPass, setShowPass] = useState(false)
   const [form, setForm] = useState({ first: '', last: '', phone: '', email: '', password: '' })
   const [touched, setTouched] = useState<Record<string, boolean>>({})
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [googleIdToken, setGoogleIdToken] = useState<string | null>(null)
+  const [googlePassword, setGooglePassword] = useState('')
+  const [googlePassError, setGooglePassError] = useState<string | null>(null)
+  const [googleSubmitting, setGoogleSubmitting] = useState(false)
 
   const errors = {
     first:    !form.first.trim()        ? 'Required'             : null,
@@ -118,10 +125,67 @@ const SignUp = () => {
 
   const touch = (key: string) => setTouched(t => ({ ...t, [key]: true }))
 
-  const handleNext = () => {
-    if (!isValid) return
-    setUser({ firstName: form.first, lastName: form.last, phone: form.phone, email: form.email })
-    navigate('/auth/verify-email')
+  const [submitting, setSubmitting] = useState(false)
+
+  const handleNext = async () => {
+    if (!isValid || submitting) return
+    setSubmitting(true)
+    setSubmitError(null)
+    try {
+      await registerUser({
+        email:        form.email,
+        password:     form.password,
+        firstName:    form.first,
+        lastName:     form.last,
+        mobileNumber: form.phone,
+        role:         'CONSUMER',
+      })
+      setUser({ firstName: form.first, lastName: form.last, phone: form.phone, email: form.email })
+      navigate('/auth/verify-email')
+    } catch (err: any) {
+      setSubmitError(typeof err === 'string' ? err : 'Registration failed. Please try again.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const handleGoogleSuccess = (credentialResponse: { credential?: string }) => {
+    const idToken = credentialResponse.credential
+    if (!idToken) {
+      setSubmitError('Google sign-up failed. Please try again.')
+      return
+    }
+    setSubmitError(null)
+    setGooglePassword('')
+    setGooglePassError(null)
+    setGoogleIdToken(idToken)
+  }
+
+  const submitGoogleRegistration = async () => {
+    if (!googleIdToken) return
+    if (googlePassword.length < 8) {
+      setGooglePassError('Min. 8 characters')
+      return
+    }
+    setGoogleSubmitting(true)
+    setGooglePassError(null)
+    try {
+      const data = await googleRegistration({ idToken: googleIdToken, intendedRole: 'CONSUMER', password: googlePassword })
+      const accessToken = data?.data?.accessToken ?? data?.accessToken ?? data?.token
+      const refreshToken = data?.data?.refreshToken ?? data?.refreshToken
+      if (accessToken) {
+        localStorage.setItem('accessToken', accessToken)
+        if (refreshToken) localStorage.setItem('refreshToken', refreshToken)
+        setToken(accessToken)
+      }
+      if (data?.user) setUser(data.user)
+      setGoogleIdToken(null)
+      navigate('/')
+    } catch (err: any) {
+      setGooglePassError(typeof err === 'string' ? err : 'Google sign-up failed. Please try again.')
+    } finally {
+      setGoogleSubmitting(false)
+    }
   }
 
   return (
@@ -144,10 +208,20 @@ const SignUp = () => {
               <OAuthAppleButton fullWidth variant="contained" whileTap={{ scale: 0.97 }} onClick={() => navigate('/')}>
                 <AppleIcon /> Continue with Apple
               </OAuthAppleButton>
-              <OAuthGoogleButton fullWidth variant="outlined" whileTap={{ scale: 0.97 }} onClick={() => navigate('/')} sx={{ color: 'text.primary' }}>
-                <GoogleIcon /> Continue with Google
-              </OAuthGoogleButton>
+              <Box sx={{ position: 'relative' }}>
+                <OAuthGoogleButton fullWidth variant="outlined" whileTap={{ scale: 0.97 }} sx={{ color: 'text.primary' }}>
+                  <GoogleIcon /> Continue with Google
+                </OAuthGoogleButton>
+                <Box sx={{ position: 'absolute', inset: 0, opacity: 0, '& > div, & iframe': { width: '100% !important', height: '100% !important' } }}>
+                  <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={() => setSubmitError('Google sign-up failed. Please try again.')}
+                    width="400"
+                  />
+                </Box>
+              </Box>
             </OAuthGroup>
+            {submitError && <FieldErrorText sx={{ textAlign: 'center', mt: 1 }}>{submitError}</FieldErrorText>}
 
             <DividerRow>
               <DividerLine /><DividerLabel variant="caption">or sign up with email</DividerLabel><DividerLine />
@@ -199,10 +273,45 @@ const SignUp = () => {
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.28 }}>
           <FooterBox>
-            <PrimaryButton onClick={handleNext} label="Continue" disabled={!isValid} />
+            <PrimaryButton onClick={handleNext} label={submitting ? 'Creating account...' : 'Continue'} disabled={!isValid || submitting} />
           </FooterBox>
         </motion.div>
       </FormCard>
+
+      <Dialog open={!!googleIdToken} onClose={() => !googleSubmitting && setGoogleIdToken(null)} fullWidth maxWidth="xs">
+        <DialogTitle>Set a password</DialogTitle>
+        <DialogContent>
+          <Typography sx={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', mb: 2 }}>
+            Create a password for your TrackLynk account. You can use it to sign in later if you don't use Google.
+          </Typography>
+          <TextField
+            fullWidth
+            autoFocus
+            type={showPass ? 'text' : 'password'}
+            placeholder="At least 8 characters"
+            value={googlePassword}
+            onChange={e => setGooglePassword(e.target.value)}
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <PasswordIconButton onClick={() => setShowPass(s => !s)} edge="end">
+                      {showPass ? <EyeOff size={17} /> : <Eye size={17} />}
+                    </PasswordIconButton>
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+          {googlePassError && <FieldErrorText>{googlePassError}</FieldErrorText>}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setGoogleIdToken(null)} disabled={googleSubmitting}>Cancel</Button>
+          <Button onClick={submitGoogleRegistration} disabled={googleSubmitting} variant="contained">
+            {googleSubmitting ? 'Creating...' : 'Continue'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </ScreenRoot>
   )
 }
