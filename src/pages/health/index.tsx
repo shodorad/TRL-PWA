@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Box, Typography } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { glassCard } from '@/styles/glass'
+import { SectionLabel, SegmentedControl, ScoreRing, AppBadge } from '@/components'
 
 // ─── Mock data ─────────────────────────────────────────────────────────────────
 
@@ -49,48 +50,23 @@ function scoreColor(s: number) {
   return '#E74C3C'
 }
 
-function scoreGrade(s: number) {
-  if (s >= 90) return 'A'
-  if (s >= 80) return 'B+'
-  if (s >= 70) return 'B'
-  if (s >= 60) return 'C+'
-  return 'C'
-}
-
-const MAINT_CHIP: Record<'ok' | 'due_soon' | 'overdue', { label: string; color: string; bg: string }> = {
-  ok:       { label: 'OK',       color: '#2ECC71', bg: 'rgba(46,204,113,0.12)' },
-  due_soon: { label: 'Due Soon', color: '#F5A623', bg: 'rgba(245,166,35,0.12)' },
-  overdue:  { label: 'Overdue',  color: '#E74C3C', bg: 'rgba(231,76,60,0.12)'  },
+const MAINT_VARIANT: Record<'ok' | 'due_soon' | 'overdue', 'success' | 'warning' | 'error'> = {
+  ok:       'success',
+  due_soon: 'warning',
+  overdue:  'error',
 }
 
 // ─── Styled ────────────────────────────────────────────────────────────────────
 
-const Root           = styled(Box)({ height: '100%', display: 'flex', flexDirection: 'column', overflowY: 'auto', paddingBottom: 82 })
+const Root           = styled(Box)({ height: '100%', display: 'flex', flexDirection: 'column', overflowY: 'auto', paddingBottom: '82px' })
 const Header         = styled(Box)({ padding: '16px 20px 14px', flexShrink: 0 })
 const HeaderRow      = styled(Box)({ display: 'flex', alignItems: 'center', justifyContent: 'space-between' })
 const Title          = styled(Typography)({ fontSize: 22, fontWeight: 800, letterSpacing: '-0.5px' })
-const ActiveChip     = styled(Box)({ background: 'rgba(200,255,0,0.10)', border: '1px solid rgba(200,255,0,0.22)', borderRadius: 99, padding: '3px 10px', display: 'flex', alignItems: 'center', gap: 5 })
-const ActiveDot      = styled(Box)({ width: 5, height: 5, borderRadius: '50%', backgroundColor: '#C8FF00' })
-const ActiveLabel    = styled(Typography)({ fontSize: 10, fontWeight: 600, letterSpacing: '1px', textTransform: 'uppercase', color: '#C8FF00' })
-
-const TabRow         = styled(Box)({ display: 'flex', margin: '14px 20px 0', gap: 8 })
-const TabPill        = styled('button')<{ active: number }>(({ active }) => ({
-  flex: 1, padding: '9px 0', background: active ? 'rgba(200,255,0,0.10)' : 'rgba(255,255,255,0.05)',
-  border: `1px solid ${active ? 'rgba(200,255,0,0.25)' : 'rgba(255,255,255,0.08)'}`,
-  borderRadius: 10, fontFamily: 'Inter, sans-serif', fontSize: 13, fontWeight: 600,
-  color: active ? '#C8FF00' : 'rgba(255,255,255,0.50)', cursor: 'pointer', transition: 'all 0.15s ease',
-}))
-
-const Body           = styled(Box)({ padding: '16px 16px 0', display: 'flex', flexDirection: 'column', gap: 12 })
-const SectionLabel   = styled(Typography)({ fontSize: 11, fontWeight: 700, letterSpacing: '0.6px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 8 })
+const Body           = styled(Box)({ padding: '16px 20px 0', display: 'flex', flexDirection: 'column', gap: 12 })
 
 // Score card
 const ScoreCard      = styled(Box)({ ...glassCard, borderRadius: 14, padding: '20px' })
 const ScoreTop       = styled(Box)({ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 16 })
-const RingWrap       = styled(Box)({ position: 'relative', width: 100, height: 100, flexShrink: 0 })
-const RingCenter     = styled(Box)({ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' })
-const RingGrade      = styled(Typography)({ fontSize: 22, fontWeight: 800, letterSpacing: '-0.5px', lineHeight: 1 })
-const RingScore      = styled(Typography)({ fontSize: 11, color: 'rgba(255,255,255,0.40)', marginTop: 1 })
 const ScoreRight     = styled(Box)({ flex: 1 })
 const ScoreLabelText = styled(Typography)({ fontSize: 15, fontWeight: 700 })
 const PeerBadge      = styled(Box)({ display: 'inline-flex', alignItems: 'center', marginTop: 4, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.10)', borderRadius: 6, padding: '3px 8px' })
@@ -115,12 +91,6 @@ const MaintCard      = styled(Box)({ ...glassCard, borderRadius: 14, padding: '4
 const MaintRow       = styled(Box)({ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', gap: 12 })
 const MaintName      = styled(Typography)({ fontSize: 13, fontWeight: 500, flex: 1 })
 const MaintDue       = styled(Typography)({ fontSize: 12, color: 'rgba(255,255,255,0.40)' })
-const MaintChip      = styled(Box)<{ chipcolor: string; chipbg: string }>(({ chipcolor, chipbg }) => ({
-  background: chipbg, border: `1px solid ${chipcolor}40`, borderRadius: 99, padding: '2px 8px',
-}))
-const MaintChipLabel = styled(Typography)<{ chipcolor: string }>(({ chipcolor }) => ({
-  fontSize: 10, fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase', color: chipcolor,
-}))
 
 // ─── Sparkline ────────────────────────────────────────────────────────────────
 
@@ -158,37 +128,6 @@ const Sparkline = ({ data, color }: { data: number[]; color: string }) => {
   )
 }
 
-// ─── Score ring ───────────────────────────────────────────────────────────────
-
-const ScoreRing = ({ score, tab }: { score: number; tab: string }) => {
-  const r    = 44
-  const circ = 2 * Math.PI * r
-  const fill = (score / 100) * circ
-  const color = scoreColor(score)
-  const grade = scoreGrade(score)
-
-  return (
-    <RingWrap>
-      <svg width="100" height="100" viewBox="0 0 100 100" style={{ transform: 'rotate(-90deg)' }}>
-        <circle cx="50" cy="50" r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="7" />
-        <motion.circle
-          key={`${tab}-ring`}
-          cx="50" cy="50" r={r} fill="none"
-          stroke={color} strokeWidth="7" strokeLinecap="round"
-          strokeDasharray={`${fill} ${circ}`}
-          initial={{ strokeDasharray: `0 ${circ}` }}
-          animate={{ strokeDasharray: `${fill} ${circ}` }}
-          transition={{ duration: 0.9, ease: [0.0, 0.0, 0.2, 1] }}
-        />
-      </svg>
-      <RingCenter>
-        <RingGrade sx={{ color }}>{grade}</RingGrade>
-        <RingScore>{score}</RingScore>
-      </RingCenter>
-    </RingWrap>
-  )
-}
-
 // ─── Main component ────────────────────────────────────────────────────────────
 
 const Health = () => {
@@ -213,17 +152,20 @@ const Health = () => {
       <Header>
         <HeaderRow>
           <Title color="text.primary">Health</Title>
-          <ActiveChip>
-            <ActiveDot />
-            <ActiveLabel>Active</ActiveLabel>
-          </ActiveChip>
+          <AppBadge label="Active" variant="lime" size="sm" />
         </HeaderRow>
 
         {/* Tab toggle */}
-        <TabRow>
-          <TabPill active={isDriver ? 1 : 0} onClick={() => setTab('driver')}>Driver</TabPill>
-          <TabPill active={!isDriver ? 1 : 0} onClick={() => setTab('vehicle')}>Vehicle</TabPill>
-        </TabRow>
+        <Box sx={{ mt: '14px' }}>
+          <SegmentedControl
+            options={[
+              { value: 'driver',  label: 'Driver'  },
+              { value: 'vehicle', label: 'Vehicle' },
+            ]}
+            value={tab}
+            onChange={setTab}
+          />
+        </Box>
       </Header>
 
       <AnimatePresence mode="wait">
@@ -239,7 +181,7 @@ const Health = () => {
             <motion.div {...stagger(0)}>
               <ScoreCard>
                 <ScoreTop>
-                  <ScoreRing score={score} tab={tab} />
+                  <ScoreRing score={score} animKey={tab} />
                   <ScoreRight>
                     <ScoreLabelText color="text.primary">
                       {isDriver ? 'Driver Score' : 'Vehicle Score'}
@@ -267,7 +209,7 @@ const Health = () => {
 
             {/* Factor list */}
             <motion.div {...stagger(topTip ? 2 : 1)}>
-              <SectionLabel>{isDriver ? 'Driver Factors' : 'Vehicle Factors'}</SectionLabel>
+              <SectionLabel sx={{ mb: 8 }}>{isDriver ? 'Driver Factors' : 'Vehicle Factors'}</SectionLabel>
               <FactorCard>
                 {factors.map((f, i) => {
                   const fColor = scoreColor(f.score)
@@ -300,19 +242,17 @@ const Health = () => {
             {/* Maintenance timeline (vehicle only) */}
             {!isDriver && (
               <motion.div {...stagger(3)}>
-                <SectionLabel>Maintenance</SectionLabel>
+                <SectionLabel sx={{ mb: 8 }}>Maintenance</SectionLabel>
                 <MaintCard>
                   {MAINTENANCE_ITEMS.map((item, i) => {
-                    const chip = MAINT_CHIP[item.status]
+                    const maintLabel = item.status === 'ok' ? 'OK' : item.status === 'due_soon' ? 'Due Soon' : 'Overdue'
                     return (
                       <Box key={item.label}>
                         {i > 0 && <FactorDivider />}
                         <MaintRow>
                           <MaintName color="text.primary">{item.label}</MaintName>
                           <MaintDue>{item.due}</MaintDue>
-                          <MaintChip chipcolor={chip.color} chipbg={chip.bg}>
-                            <MaintChipLabel chipcolor={chip.color}>{chip.label}</MaintChipLabel>
-                          </MaintChip>
+                          <AppBadge label={maintLabel} variant={MAINT_VARIANT[item.status]} size="sm" />
                         </MaintRow>
                       </Box>
                     )

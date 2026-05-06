@@ -4,21 +4,9 @@ import { Box, Typography, Button } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api'
 import { useVehicle } from '@/contexts/VehicleContext'
+import { Avatar } from '@/components'
+import { DARK_MAP_STYLES } from '@/styles/mapStyles'
 import { ChevronDown, Bell, Zap, LocateFixed } from 'lucide-react'
-
-const DARK_MAP_STYLES = [
-  { elementType: 'geometry', stylers: [{ color: '#0d0d14' }] },
-  { elementType: 'labels.text.fill', stylers: [{ color: '#746855' }] },
-  { elementType: 'labels.text.stroke', stylers: [{ color: '#0d0d14' }] },
-  { featureType: 'administrative', elementType: 'geometry', stylers: [{ visibility: 'off' }] },
-  { featureType: 'poi', stylers: [{ visibility: 'off' }] },
-  { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#1a1a24' }] },
-  { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#9ca5b3' }] },
-  { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#242430' }] },
-  { featureType: 'road.local', elementType: 'labels', stylers: [{ visibility: 'off' }] },
-  { featureType: 'transit', stylers: [{ visibility: 'off' }] },
-  { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#060d14' }] },
-]
 
 const ROUTE_PATH = [
   { lat: 40.7484, lng: -73.9967 },
@@ -49,7 +37,6 @@ const DeviceSubtitle      = styled(Typography)({ color: 'rgba(255,255,255,0.26)'
 const HeaderRight         = styled(Box)({ display: 'flex', alignItems: 'center', gap: '8px' })
 const NotificationButton  = styled(Button)({ minWidth: 0, width: 30, height: 30, borderRadius: '50%', padding: 0, backgroundColor: 'rgba(255,255,255,0.07)' })
 const MotionNotifButton   = motion.create(NotificationButton)
-const AvatarBadge         = styled(Box)({ width: 30, height: 30, borderRadius: '50%', background: 'linear-gradient(135deg, #C8FF00, #8FB800)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: '#000' })
 const TripCardShell       = styled('div')({ position: 'absolute', top: 80, left: 12, right: 12, zIndex: 20, background: 'rgba(12,15,22,0.90)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: 18, padding: '10px 12px', display: 'flex', alignItems: 'center', gap: 10 })
 const MotionTripCardShell = motion.create(TripCardShell)
 const TripCardContent     = styled(Box)({ flex: 1 })
@@ -122,7 +109,7 @@ const FloatingHeader = () => {
         <MotionNotifButton whileTap={{ scale: 0.90 }} variant="outlined">
           <Bell size={13} color="rgba(255,255,255,0.55)" />
         </MotionNotifButton>
-        <AvatarBadge>S</AvatarBadge>
+        <Avatar name={vehicle.nickname || vehicle.model || 'User'} sx={{ width: 30, height: 30, fontSize: 11 }} />
       </HeaderRight>
     </MotionHeaderShell>
   )

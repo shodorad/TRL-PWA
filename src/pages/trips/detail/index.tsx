@@ -1,27 +1,13 @@
 import { useCallback, useRef, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Box, Typography, IconButton } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { GoogleMap, useJsApiLoader, Polyline, Marker } from '@react-google-maps/api'
-import { ArrowLeft, CheckCircle, AlertTriangle, Zap, Gauge } from 'lucide-react'
+import { CheckCircle, AlertTriangle, Zap, Gauge } from 'lucide-react'
 import { glassCard } from '@/styles/glass'
-
-// ─── Dark map styles (shared with Home) ───────────────────────────────────────
-
-const DARK_MAP_STYLES = [
-  { elementType: 'geometry',           stylers: [{ color: '#0d0d14' }] },
-  { elementType: 'labels.text.fill',   stylers: [{ color: '#746855' }] },
-  { elementType: 'labels.text.stroke', stylers: [{ color: '#0d0d14' }] },
-  { featureType: 'administrative', elementType: 'geometry', stylers: [{ visibility: 'off' }] },
-  { featureType: 'poi',            stylers: [{ visibility: 'off' }] },
-  { featureType: 'road',    elementType: 'geometry',       stylers: [{ color: '#1a1a24' }] },
-  { featureType: 'road',    elementType: 'labels.text.fill', stylers: [{ color: '#9ca5b3' }] },
-  { featureType: 'road.highway', elementType: 'geometry',  stylers: [{ color: '#242430' }] },
-  { featureType: 'road.local',   elementType: 'labels',    stylers: [{ visibility: 'off' }] },
-  { featureType: 'transit', stylers: [{ visibility: 'off' }] },
-  { featureType: 'water',  elementType: 'geometry',        stylers: [{ color: '#060d14' }] },
-]
+import { SectionLabel, PageHeader, ScoreRing, AppBadge } from '@/components'
+import { DARK_MAP_STYLES } from '@/styles/mapStyles'
 
 // ─── Score config ──────────────────────────────────────────────────────────────
 
@@ -131,15 +117,6 @@ const TRIP_DETAILS: Record<number, TripDetail> = {
 // ─── Styled ───────────────────────────────────────────────────────────────────
 
 const Root        = styled(Box)({ height: '100%', display: 'flex', flexDirection: 'column', overflowY: 'auto', backgroundColor: 'transparent', paddingBottom: 82 })
-const Header      = styled(Box)({ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 16px 12px', flexShrink: 0 })
-const BackBtn     = styled(IconButton)({ width: 36, height: 36, borderRadius: '10px', backgroundColor: 'rgba(255,255,255,0.07)', flexShrink: 0 })
-const HeaderInfo  = styled(Box)({ flex: 1, minWidth: 0 })
-const TripTitle   = styled(Typography)({ fontSize: 17, fontWeight: 700, letterSpacing: '-0.3px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' })
-const TripSubline = styled(Typography)({ fontSize: 12, color: 'rgba(255,255,255,0.40)', marginTop: '1px' })
-const ScoreBadge  = styled(Box)<{ gradecolor: string }>(({ gradecolor }) => ({
-  width: 36, height: 36, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-  backgroundColor: `${gradecolor}18`, border: `1px solid ${gradecolor}35`, flexShrink: 0,
-}))
 
 const MapSection  = styled(Box)({ position: 'relative', height: 220, flexShrink: 0, margin: '0 16px', overflow: 'hidden', ...glassCard, borderRadius: 16 })
 const MapFade     = styled('div')({ position: 'absolute', bottom: 0, left: 0, right: 0, height: 60, background: 'linear-gradient(to top, #04050d, transparent)', pointerEvents: 'none', zIndex: 2 })
@@ -152,13 +129,7 @@ const StatValue   = styled(Typography)({ fontSize: 20, fontWeight: 700, letterSp
 const StatLabel   = styled(Typography)({ fontSize: 10, fontWeight: 600, letterSpacing: '0.8px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginTop: 1 })
 
 const Body        = styled(Box)({ padding: '16px 16px 0', display: 'flex', flexDirection: 'column', gap: 12 })
-const SectionLabel = styled(Typography)({ fontSize: 11, fontWeight: 700, letterSpacing: '0.6px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 8 })
-
 const ScoreCard   = styled(Box)({ ...glassCard, borderRadius: 14, padding: '18px 20px', display: 'flex', alignItems: 'center', gap: 20 })
-const GaugeWrap   = styled(Box)({ position: 'relative', width: 96, height: 96, flexShrink: 0 })
-const GaugeCenterText = styled(Box)({ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' })
-const GaugeGrade  = styled(Typography)({ fontSize: 28, fontWeight: 800, letterSpacing: '-1px', lineHeight: 1 })
-const GaugeLabel  = styled(Typography)({ fontSize: 10, fontWeight: 600, color: 'rgba(255,255,255,0.40)', letterSpacing: '0.4px' })
 const ScoreDetail = styled(Box)({ flex: 1 })
 const ScoreTitle  = styled(Typography)({ fontSize: 15, fontWeight: 700, marginBottom: 2 })
 const ScoreDesc   = styled(Typography)({ fontSize: 12.5, color: 'rgba(255,255,255,0.45)', lineHeight: 1.5 })
@@ -209,34 +180,7 @@ const RouteMap = ({ route, score }: { route: { lat: number; lng: number }[]; sco
   )
 }
 
-// ─── Score gauge ───────────────────────────────────────────────────────────────
-
-const ScoreGauge = ({ grade }: { grade: ScoreGrade }) => {
-  const cfg  = SCORE_CONFIG[grade]
-  const r    = 42
-  const circ = 2 * Math.PI * r
-  const fill = (cfg.numeric / 100) * circ
-
-  return (
-    <GaugeWrap>
-      <svg width="96" height="96" viewBox="0 0 96 96" style={{ transform: 'rotate(-90deg)' }}>
-        <circle cx="48" cy="48" r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="7" />
-        <motion.circle
-          cx="48" cy="48" r={r} fill="none"
-          stroke={cfg.color} strokeWidth="7" strokeLinecap="round"
-          strokeDasharray={`${fill} ${circ}`}
-          initial={{ strokeDasharray: `0 ${circ}` }}
-          animate={{ strokeDasharray: `${fill} ${circ}` }}
-          transition={{ duration: 1, delay: 0.3, ease: [0.0, 0.0, 0.2, 1] }}
-        />
-      </svg>
-      <GaugeCenterText>
-        <GaugeGrade sx={{ color: cfg.color }}>{grade}</GaugeGrade>
-        <GaugeLabel>Score</GaugeLabel>
-      </GaugeCenterText>
-    </GaugeWrap>
-  )
-}
+const SCORE_VARIANT = { A: 'success', B: 'lime', C: 'warning', D: 'error' } as const
 
 // ─── Main component ────────────────────────────────────────────────────────────
 
@@ -260,18 +204,18 @@ const TripDetail = () => {
   return (
     <Root>
       {/* Header */}
-      <Header>
-        <BackBtn onClick={() => navigate('/trips')} size="small">
-          <ArrowLeft size={17} color="rgba(255,255,255,0.80)" />
-        </BackBtn>
-        <HeaderInfo>
-          <TripTitle color="text.primary">{trip.name}</TripTitle>
-          <TripSubline>{trip.date} · {trip.start} — {trip.end}</TripSubline>
-        </HeaderInfo>
-        <ScoreBadge gradecolor={scoreConfig.color}>
-          <Typography sx={{ fontSize: 15, fontWeight: 800, color: scoreConfig.color }}>{trip.score}</Typography>
-        </ScoreBadge>
-      </Header>
+      <PageHeader
+        title={trip.name}
+        subtitle={`${trip.date} · ${trip.start} — ${trip.end}`}
+        onBack={() => navigate('/trips')}
+        rightSlot={
+          <AppBadge
+            label={trip.score}
+            variant={SCORE_VARIANT[trip.score]}
+            size="md"
+          />
+        }
+      />
 
       {/* Map */}
       <motion.div {...stagger(0)}>
@@ -309,9 +253,9 @@ const TripDetail = () => {
       <Body>
         {/* Score section */}
         <motion.div {...stagger(2)}>
-          <SectionLabel>Driving Score</SectionLabel>
+          <SectionLabel sx={{ mb: 8 }}>Driving Score</SectionLabel>
           <ScoreCard>
-            <ScoreGauge grade={trip.score} />
+            <ScoreRing score={scoreConfig.numeric} size={96} animKey="trip-detail" />
             <ScoreDetail>
               <ScoreTitle color="text.primary">{scoreConfig.label}</ScoreTitle>
               <ScoreDesc>
@@ -325,7 +269,7 @@ const TripDetail = () => {
 
         {/* Events section */}
         <motion.div {...stagger(3)}>
-          <SectionLabel>Driving Events</SectionLabel>
+          <SectionLabel sx={{ mb: 8 }}>Driving Events</SectionLabel>
           <EventCard>
             {trip.events.length === 0 ? (
               <CleanDrive>

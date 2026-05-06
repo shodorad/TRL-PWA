@@ -9,6 +9,8 @@ import PrimaryButton from '@/components/common/PrimaryButton'
 import { glassCard } from '@/styles/glass'
 import { usePlan } from '@/contexts/PlanContext'
 import type { PlanTier } from '@/contexts/PlanContext'
+import { SegmentedControl, IconBox } from '@/components'
+import { colors } from '@/styles/tokens'
 
 const STEP = 1
 const TOTAL = 10
@@ -76,13 +78,9 @@ const ScreenRoot      = styled('div')({ height: '100%', display: 'flex', flexDir
 const ScrollArea      = styled('div')({ flex: 1, overflowY: 'auto', padding: '16px 24px 0' })
 const Heading         = styled('h2')({ fontSize: 26, fontWeight: 800, color: '#fff', marginBottom: 6, letterSpacing: '-0.6px', fontFamily: 'Inter, sans-serif' })
 const SubHeading      = styled('p')({ color: 'rgba(255,255,255,0.42)', fontSize: 14, marginBottom: 20, fontFamily: 'Inter, sans-serif' })
-const ToggleWrapper   = styled('div')({ display: 'flex', background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 14, padding: 4, marginBottom: 20, position: 'relative' })
-const ToggleButton    = styled('button')<{ active?: boolean }>(({ active }) => ({ flex: 1, padding: '9px 8px', background: 'none', border: 'none', color: active ? '#C8FF00' : 'rgba(255,255,255,0.42)', fontSize: 13, fontWeight: 600, cursor: 'pointer', position: 'relative', zIndex: 1, fontFamily: 'Inter, sans-serif', transition: 'color 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, borderRadius: 10 }))
-const SaveBadge       = styled('span')({ fontSize: 10, background: 'rgba(74,222,128,0.15)', color: '#4ade80', padding: '2px 7px', borderRadius: 99, fontWeight: 700, border: '1px solid rgba(74,222,128,0.2)' })
 const PlanCardWrapper = styled('div')<{ selected: boolean }>(({ selected }) => ({ ...glassCard, padding: '18px', marginBottom: 12, cursor: 'pointer', border: selected ? '1.5px solid rgba(200,255,0,0.55)' : '1px solid rgba(255,255,255,0.10)', background: selected ? 'rgba(200,255,0,0.05)' : 'rgba(255,255,255,0.055)', boxShadow: selected ? '0 0 24px rgba(200,255,0,0.08), 0 8px 32px rgba(0,0,0,0.55)' : '0 8px 32px rgba(0,0,0,0.55)', transition: 'border-color 0.2s, background 0.2s, box-shadow 0.2s', position: 'relative', overflow: 'hidden' }))
 const CardTopRow      = styled('div')({ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 12 })
 const CardLeft        = styled('div')({ display: 'flex', alignItems: 'center', gap: 10 })
-const IconCircle      = styled('div')<{ selected: boolean }>(({ selected }) => ({ width: 36, height: 36, borderRadius: '50%', background: selected ? 'rgba(200,255,0,0.14)' : 'rgba(255,255,255,0.07)', border: selected ? '1px solid rgba(200,255,0,0.3)' : '1px solid rgba(255,255,255,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'background 0.2s, border-color 0.2s' }))
 const TierLabel       = styled('span')<{ selected: boolean }>(({ selected }) => ({ fontSize: 16, fontWeight: 800, color: selected ? '#fff' : 'rgba(255,255,255,0.85)', letterSpacing: '-0.3px', fontFamily: 'Inter, sans-serif', display: 'block' }))
 const VehicleCaption  = styled('span')({ fontSize: 11.5, color: 'rgba(255,255,255,0.32)', fontFamily: 'Inter, sans-serif', display: 'block', marginTop: 1 })
 const PopularBadge    = styled('span')({ fontSize: 10, background: 'rgba(200,255,0,0.14)', color: '#C8FF00', padding: '3px 9px', borderRadius: 99, fontWeight: 700, border: '1px solid rgba(200,255,0,0.28)', flexShrink: 0 })
@@ -110,9 +108,12 @@ const PlanCard = ({ plan, selected, annual, onSelect }: {
       <PlanCardWrapper selected={selected}>
         <CardTopRow>
           <CardLeft>
-            <IconCircle selected={selected}>
-              <Icon size={16} color={selected ? '#C8FF00' : 'rgba(255,255,255,0.45)'} />
-            </IconCircle>
+            <IconBox
+              icon={<Icon size={16} color={selected ? colors.lime : colors.textSecondary} />}
+              size="sm"
+              variant={selected ? 'lime' : 'surface'}
+              borderRadius={999}
+            />
             <div>
               <TierLabel selected={selected}>{plan.label}</TierLabel>
               <VehicleCaption>{plan.vehicles}</VehicleCaption>
@@ -175,20 +176,16 @@ const ChoosePlan = () => {
         </motion.div>
 
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}>
-          <ToggleWrapper>
-            {(['Monthly', 'Annual'] as const).map((label, i) => (
-              <ToggleButton key={label} active={(i === 1) === annual} onClick={() => setAnnual(i === 1)}>
-                {(i === 1) === annual && (
-                  <motion.div
-                    layoutId="billing-tab"
-                    style={{ position: 'absolute', inset: 0, background: 'rgba(200,255,0,0.14)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', borderRadius: 10, border: '1px solid rgba(200,255,0,0.28)', boxShadow: '0 0 12px rgba(200,255,0,0.1)' }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                  />
-                )}
-                {label}{i === 1 && <SaveBadge>Save up to 20%</SaveBadge>}
-              </ToggleButton>
-            ))}
-          </ToggleWrapper>
+          <Box sx={{ mb: '20px' }}>
+            <SegmentedControl
+              options={[
+                { value: 'monthly', label: 'Monthly' },
+                { value: 'annual',  label: 'Annual · Save 20%' },
+              ]}
+              value={annual ? 'annual' : 'monthly'}
+              onChange={(v) => setAnnual(v === 'annual')}
+            />
+          </Box>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>

@@ -23,6 +23,13 @@ export const globalStyles = `
     flex-direction: column;
   }
 
+  @media (min-width: 600px) {
+    #root {
+      max-width: 560px;
+      margin: 0 auto;
+    }
+  }
+
   ::-webkit-scrollbar {
     width: 0px;
   }

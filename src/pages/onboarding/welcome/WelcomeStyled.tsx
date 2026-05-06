@@ -4,22 +4,95 @@ import { styled } from '@mui/material/styles'
 
 const MotionButton = motion.create(Button)
 
-export const WelcomeRoot = styled(Box)({ height: '100%', display: 'flex', flexDirection: 'column', paddingTop: '16px' })
+export const WelcomeRoot = styled(Box)(({ theme }) => ({
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  paddingTop: '16px',
+  [theme.breakpoints.up('md')]: {
+    flexDirection: 'row',
+    paddingTop: 0,
+    overflow: 'hidden',
+    position: 'fixed',
+    inset: 0,
+  },
+}))
+
+export const LeftPanel = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  flex: 1,
+  minWidth: 0,
+  [theme.breakpoints.up('md')]: {
+    borderRight: '1px solid rgba(255,255,255,0.06)',
+  },
+}))
+
+export const RightPanel = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  [theme.breakpoints.up('md')]: {
+    flex: '0 0 380px',
+    minWidth: 380,
+    padding: '48px 40px',
+  },
+}))
 export const CarouselWrapper = styled(Box)({ flex: 1, position: 'relative', overflow: 'hidden' })
-export const HeroRoot = styled(Box)({ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', paddingBottom: '4px' })
+export const HeroRoot = styled(Box)(({ theme }) => ({
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
+  paddingBottom: '4px',
+  [theme.breakpoints.up('md')]: {
+    maxWidth: 480,
+    width: '100%',
+    margin: '0 auto',
+  },
+}))
 export const HeroTitle = styled(Typography)({ fontSize: 42, fontWeight: 900, letterSpacing: '-1.8px', lineHeight: 1, textAlign: 'center', marginBottom: '8px' })
 export const HeroSubtitle = styled(Typography)({ fontSize: 14, display: 'block', textAlign: 'center', marginBottom: '18px' })
 export const VehicleCountRow = styled(Box)({ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '14px' })
 export const VehicleIconBox = styled(Box)({ width: 24, height: 24, borderRadius: '7px', background: 'rgba(200,255,0,0.10)', border: '1px solid rgba(200,255,0,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center' })
 export const VehicleCountLabel = styled(Typography)({ fontSize: 12.5, fontWeight: 500 })
-export const FeaturesRoot = styled(Box)({ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingLeft: '24px', paddingRight: '24px' })
+export const FeaturesRoot = styled(Box)(({ theme }) => ({
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  paddingLeft: '24px',
+  paddingRight: '24px',
+  [theme.breakpoints.up('md')]: {
+    maxWidth: 480,
+    width: '100%',
+    margin: '0 auto',
+    paddingLeft: '32px',
+    paddingRight: '32px',
+  },
+}))
 export const FeaturesHeadingBox = styled(Box)({ marginBottom: '24px' })
 export const SlideHeading = styled(Typography)({ fontSize: 28, fontWeight: 800, letterSpacing: '-0.8px', marginBottom: '6px' })
 export const SlideCaption = styled(Typography)({ fontSize: 14 })
 export const FeatureIconBox = styled(Box)({ width: 42, height: 42, borderRadius: '13px', flexShrink: 0, background: 'rgba(200,255,0,0.10)', border: '1px solid rgba(200,255,0,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center' })
 export const FeatureTitle = styled(Typography)({ fontWeight: 600, fontSize: 14, marginBottom: '3px' })
 export const FeatureDesc = styled(Typography)({ fontSize: 12.5, color: 'rgba(255,255,255,0.40)' })
-export const PricingRoot = styled(Box)({ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingLeft: '24px', paddingRight: '24px' })
+export const PricingRoot = styled(Box)(({ theme }) => ({
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  paddingLeft: '24px',
+  paddingRight: '24px',
+  [theme.breakpoints.up('md')]: {
+    maxWidth: 480,
+    width: '100%',
+    margin: '0 auto',
+    paddingLeft: '32px',
+    paddingRight: '32px',
+  },
+}))
 export const PricingHeadingBox = styled(Box)({ marginBottom: '18px' })
 export const ToggleTrack = styled('div')({ display: 'flex', background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, padding: 3, marginBottom: 16, position: 'relative' })
 export const ToggleThumb = styled(motion.div)({ position: 'absolute', top: 3, bottom: 3, width: 'calc(50% - 3px)', background: 'rgba(200,255,0,0.12)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', borderRadius: 9, border: '1px solid rgba(200,255,0,0.25)' })
@@ -33,10 +106,60 @@ export const PlanFeaturesList = styled(Box)({ display: 'flex', flexDirection: 'c
 export const PlanFeatureRow = styled(Box)({ display: 'flex', alignItems: 'center', gap: '10px' })
 export const CheckIconBox = styled(Box)({ width: 20, height: 20, borderRadius: '99px', flexShrink: 0, background: 'rgba(200,255,0,0.10)', border: '1px solid rgba(200,255,0,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center' })
 export const PlanFeatureLabel = styled(Typography)({ fontSize: 13 })
-export const DotsRow = styled(Box)({ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '7px', paddingTop: '18px', paddingBottom: '18px' })
+export const DotsRow = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  gap: '7px',
+  paddingTop: '18px',
+  paddingBottom: '18px',
+  [theme.breakpoints.up('md')]: {
+    maxWidth: 480,
+    width: '100%',
+    margin: '0 auto',
+  },
+}))
 export const DotButton = styled('button')({ background: 'none', border: 'none', padding: '8px 2px', cursor: 'pointer', display: 'flex', alignItems: 'center' })
-export const CtaSection = styled(Box)({ paddingLeft: '24px', paddingRight: '24px', paddingBottom: '32px', display: 'flex', flexDirection: 'column', gap: '10px' })
-export const GetStartedButton = styled(MotionButton)({ height: 54, borderRadius: '18px', fontSize: 16, fontWeight: 700, letterSpacing: '-0.2px' })
-export const ExploreButton = styled(MotionButton)({ height: 48, background: 'rgba(255,255,255,0.06)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', color: 'rgba(255,255,255,0.72)', fontSize: 15 })
-export const SignInButton = styled(MotionButton)({ color: 'rgba(255,255,255,0.38)', fontSize: 14, paddingTop: '4px', paddingBottom: '4px' })
+export const CtaSection = styled(Box)(({ theme }) => ({
+  paddingLeft: '24px',
+  paddingRight: '24px',
+  paddingBottom: '32px',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '10px',
+  [theme.breakpoints.up('md')]: {
+    padding: 0,
+  },
+}))
+export const GetStartedButton = styled(MotionButton)(({ theme }) => ({
+  height: 54,
+  borderRadius: '18px',
+  fontSize: 16,
+  fontWeight: 700,
+  letterSpacing: '-0.2px',
+  [theme.breakpoints.up('md')]: {
+    whiteSpace: 'nowrap',
+  },
+}))
+export const ExploreButton = styled(MotionButton)(({ theme }) => ({
+  height: 48,
+  background: 'rgba(255,255,255,0.06)',
+  backdropFilter: 'blur(12px)',
+  WebkitBackdropFilter: 'blur(12px)',
+  color: 'rgba(255,255,255,0.72)',
+  fontSize: 15,
+  [theme.breakpoints.up('md')]: {
+    fontSize: 13,
+    whiteSpace: 'nowrap',
+  },
+}))
+export const SignInButton = styled(MotionButton)(({ theme }) => ({
+  color: 'rgba(255,255,255,0.38)',
+  fontSize: 14,
+  paddingTop: '4px',
+  paddingBottom: '4px',
+  [theme.breakpoints.up('md')]: {
+    whiteSpace: 'nowrap',
+  },
+}))
 export const SignInHighlight = styled(Box)({ color: '#C8FF00', fontWeight: 700, marginLeft: '4px' })
