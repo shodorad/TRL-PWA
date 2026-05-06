@@ -8,10 +8,51 @@ import PrimaryButton from '@/components/common/PrimaryButton'
 
 const MotionButton = motion.create(Button)
 
-const ScreenRoot        = styled(Box)({ height: '100%', display: 'flex', flexDirection: 'column', paddingTop: '16px' })
-const BackButtonWrapper = styled(Box)({ padding: '12px 20px 0' })
+const ScreenRoot = styled(Box)(({ theme }) => ({
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  paddingTop: '16px',
+  position: 'relative',
+  [theme.breakpoints.up('md')]: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 0,
+  },
+}))
+
+const FormCard = styled(Box)(({ theme }) => ({
+  width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  flex: 1,
+  [theme.breakpoints.up('md')]: {
+    flex: 'unset',
+    width: '100%',
+    maxWidth: 460,
+    background: 'rgba(255,255,255,0.03)',
+    border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: 24,
+    padding: '40px',
+    backdropFilter: 'blur(16px)',
+    WebkitBackdropFilter: 'blur(16px)',
+  },
+}))
+
 const BackBtn           = styled(MotionButton)({ minWidth: 0, width: 44, height: 44, borderRadius: '14px', padding: 0, background: 'rgba(255,255,255,0.07)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' })
-const Body              = styled(Box)({ flex: 1, overflowY: 'auto', padding: '28px 26px 0' })
+const CardHeader        = styled(Box)(({ theme }) => ({
+  padding: '16px 26px 0',
+  [theme.breakpoints.up('md')]: { padding: '0 0 24px' },
+}))
+const Body              = styled(Box)(({ theme }) => ({
+  flex: 1,
+  overflowY: 'auto',
+  padding: '28px 26px 0',
+  [theme.breakpoints.up('md')]: {
+    overflowY: 'visible',
+    padding: 0,
+  },
+}))
 const Heading           = styled(Typography)({ fontSize: 30, fontWeight: 900, letterSpacing: '-0.8px', marginBottom: '7px' })
 const Subtitle          = styled(Typography)({ fontSize: 14.5, color: 'rgba(255,255,255,0.42)', marginBottom: 32 })
 const FieldLabel        = styled(Typography)({ color: 'rgba(255,255,255,0.48)', fontSize: 12, fontWeight: 600, letterSpacing: '0.2px', display: 'block', marginBottom: '8px' })
@@ -28,7 +69,12 @@ const SSOGroup          = styled(Box)({ display: 'flex', flexDirection: 'column'
 const SignUpRow         = styled(Box)({ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, marginTop: 8 })
 const SignUpPrompt      = styled(Typography)({ fontSize: 13.5, color: 'rgba(255,255,255,0.32)' })
 const SignUpLink        = styled(MotionButton)({ color: '#C8FF00', fontSize: 13.5, fontWeight: 700, padding: 0, minWidth: 0 })
-const FooterBox         = styled(Box)({ padding: '20px 24px 48px' })
+const FooterBox         = styled(Box)(({ theme }) => ({
+  padding: '20px 24px 48px',
+  [theme.breakpoints.up('md')]: {
+    padding: 0,
+  },
+}))
 const PasswordIconBtn   = styled(IconButton)({ marginRight: '-8px' })
 
 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -70,98 +116,93 @@ const SignIn = () => {
 
   return (
     <ScreenRoot>
-      <BackButtonWrapper>
-        <BackBtn
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          whileTap={{ scale: 0.90 }}
-          onClick={() => navigate(-1)}
-          variant="outlined"
-        >
-          <ArrowLeft size={17} color="rgba(255,255,255,0.80)" />
-        </BackBtn>
-      </BackButtonWrapper>
+      <FormCard>
+        <CardHeader>
+          <BackBtn initial={{ opacity: 0 }} animate={{ opacity: 1 }} whileTap={{ scale: 0.90 }} onClick={() => navigate(-1)} variant="outlined">
+            <ArrowLeft size={17} color="rgba(255,255,255,0.80)" />
+          </BackBtn>
+        </CardHeader>
+        <Body>
+          <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06, type: 'spring', stiffness: 300, damping: 28 }}>
+            <Heading>Welcome back</Heading>
+            <Subtitle variant="body2">Sign in to your account.</Subtitle>
+          </motion.div>
 
-      <Body>
-        <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06, type: 'spring', stiffness: 300, damping: 28 }}>
-          <Heading>Welcome back</Heading>
-          <Subtitle variant="body2">Sign in to your account.</Subtitle>
-        </motion.div>
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}>
+            <FieldsGroup>
+              <Box>
+                <FieldLabel>Email address</FieldLabel>
+                <TextField
+                  fullWidth
+                  type="email"
+                  placeholder="jane@email.com"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  onBlur={() => touch('email')}
+                />
+                {touched.email && errors.email && <ErrorText>{errors.email}</ErrorText>}
+              </Box>
 
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}>
-          <FieldsGroup>
-            <Box>
-              <FieldLabel>Email address</FieldLabel>
-              <TextField
-                fullWidth
-                type="email"
-                placeholder="jane@email.com"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                onBlur={() => touch('email')}
-              />
-              {touched.email && errors.email && <ErrorText>{errors.email}</ErrorText>}
-            </Box>
+              <Box>
+                <PasswordRow>
+                  <FieldLabel sx={{ mb: 0 }}>Password</FieldLabel>
+                  <ForgotLink
+                    variant="text"
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => navigate('/auth/forgot-password')}
+                  >
+                    Forgot password?
+                  </ForgotLink>
+                </PasswordRow>
+                <TextField
+                  fullWidth
+                  type={showPass ? 'text' : 'password'}
+                  placeholder="Your password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  onBlur={() => touch('password')}
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <PasswordIconBtn onClick={() => setShowPass(s => !s)} edge="end">
+                            {showPass ? <EyeOff size={17} /> : <Eye size={17} />}
+                          </PasswordIconBtn>
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
+                />
+                {touched.password && errors.password && <ErrorText>{errors.password}</ErrorText>}
+              </Box>
+            </FieldsGroup>
 
-            <Box>
-              <PasswordRow>
-                <FieldLabel sx={{ mb: 0 }}>Password</FieldLabel>
-                <ForgotLink
-                  variant="text"
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => navigate('/auth/forgot-password')}
-                >
-                  Forgot password?
-                </ForgotLink>
-              </PasswordRow>
-              <TextField
-                fullWidth
-                type={showPass ? 'text' : 'password'}
-                placeholder="Your password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                onBlur={() => touch('password')}
-                slotProps={{
-                  input: {
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <PasswordIconBtn onClick={() => setShowPass(s => !s)} edge="end">
-                          {showPass ? <EyeOff size={17} /> : <Eye size={17} />}
-                        </PasswordIconBtn>
-                      </InputAdornment>
-                    ),
-                  },
-                }}
-              />
-              {touched.password && errors.password && <ErrorText>{errors.password}</ErrorText>}
-            </Box>
-          </FieldsGroup>
+            <PrimaryButton onClick={handleSignIn} label="Sign in" disabled={!isValid} />
 
-          <PrimaryButton onClick={handleSignIn} label="Sign in" disabled={!isValid} />
+            <DividerRow sx={{ mt: 3 }}>
+              <DividerLine /><DividerLabel variant="caption">or continue with</DividerLabel><DividerLine />
+            </DividerRow>
 
-          <DividerRow sx={{ mt: 3 }}>
-            <DividerLine /><DividerLabel variant="caption">or continue with</DividerLabel><DividerLine />
-          </DividerRow>
+            <SSOGroup sx={{ mt: 2 }}>
+              <OAuthAppleButton fullWidth variant="contained" whileTap={{ scale: 0.97 }} onClick={() => navigate('/')}>
+                <AppleIcon /> Continue with Apple
+              </OAuthAppleButton>
+              <OAuthGoogleButton fullWidth variant="outlined" whileTap={{ scale: 0.97 }} onClick={() => navigate('/')} sx={{ color: 'text.primary' }}>
+                <GoogleIcon /> Continue with Google
+              </OAuthGoogleButton>
+            </SSOGroup>
 
-          <SSOGroup sx={{ mt: 2 }}>
-            <OAuthAppleButton fullWidth variant="contained" whileTap={{ scale: 0.97 }} onClick={() => navigate('/')}>
-              <AppleIcon /> Continue with Apple
-            </OAuthAppleButton>
-            <OAuthGoogleButton fullWidth variant="outlined" whileTap={{ scale: 0.97 }} onClick={() => navigate('/')} sx={{ color: 'text.primary' }}>
-              <GoogleIcon /> Continue with Google
-            </OAuthGoogleButton>
-          </SSOGroup>
+            <SignUpRow>
+              <SignUpPrompt variant="caption">Don't have an account?</SignUpPrompt>
+              <SignUpLink variant="text" whileTap={{ scale: 0.95 }} onClick={() => navigate('/auth/sign-up')}>
+                Sign up
+              </SignUpLink>
+            </SignUpRow>
+          </motion.div>
+        </Body>
 
-          <SignUpRow>
-            <SignUpPrompt variant="caption">Don't have an account?</SignUpPrompt>
-            <SignUpLink variant="text" whileTap={{ scale: 0.95 }} onClick={() => navigate('/auth/sign-up')}>
-              Sign up
-            </SignUpLink>
-          </SignUpRow>
-        </motion.div>
-      </Body>
-
-      <FooterBox />
+        <FooterBox />
+      </FormCard>
     </ScreenRoot>
   )
 }

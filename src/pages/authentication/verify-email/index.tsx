@@ -8,15 +8,61 @@ import { useAuth } from '@/contexts/AuthContext'
 
 const MotionButton = motion.create(Button)
 
-const ScreenRoot        = styled(Box)({ height: '100%', display: 'flex', flexDirection: 'column', paddingTop: '16px' })
-const BackButtonWrapper = styled(Box)({ padding: '12px 20px 0' })
+const ScreenRoot = styled(Box)(({ theme }) => ({
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  paddingTop: '16px',
+  position: 'relative',
+  [theme.breakpoints.up('md')]: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 0,
+  },
+}))
+
+const FormCard = styled(Box)(({ theme }) => ({
+  width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  flex: 1,
+  [theme.breakpoints.up('md')]: {
+    flex: 'unset',
+    width: '100%',
+    maxWidth: 460,
+    background: 'rgba(255,255,255,0.03)',
+    border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: 24,
+    padding: '40px',
+    backdropFilter: 'blur(16px)',
+    WebkitBackdropFilter: 'blur(16px)',
+  },
+}))
+
 const BackBtn           = styled(MotionButton)({ minWidth: 0, width: 44, height: 44, borderRadius: '14px', padding: 0, background: 'rgba(255,255,255,0.07)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' })
-const Body              = styled(Box)({ flex: 1, display: 'flex', flexDirection: 'column', padding: '28px 26px 0' })
+const CardHeader        = styled(Box)(({ theme }) => ({
+  padding: '16px 26px 0',
+  [theme.breakpoints.up('md')]: { padding: '0 0 24px' },
+}))
+const Body              = styled(Box)(({ theme }) => ({
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  padding: '28px 26px 0',
+  [theme.breakpoints.up('md')]: { padding: 0 },
+}))
 const IconCircle        = styled(Box)({ width: 56, height: 56, borderRadius: '50%', background: 'rgba(200,255,0,0.10)', border: '1px solid rgba(200,255,0,0.22)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 })
 const Heading           = styled(Typography)({ fontSize: 28, fontWeight: 900, letterSpacing: '-0.6px', marginBottom: '7px' })
 const Subtitle          = styled(Typography)({ fontSize: 14, color: 'rgba(255,255,255,0.42)', lineHeight: 1.6, marginBottom: 4 })
 const MaskedEmail       = styled(Typography)({ fontSize: 14, color: '#C8FF00', fontWeight: 600, marginBottom: 32 })
-const OTPRow            = styled(Box)({ display: 'flex', gap: 10, marginBottom: 32 })
+const OTPRow            = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  gap: 10,
+  marginBottom: 32,
+  [theme.breakpoints.up('md')]: {
+    maxWidth: 360,
+  },
+}))
 const OTPInput          = styled('input')<{ filled: boolean }>(({ filled }) => ({
   width: '100%',
   height: 58,
@@ -126,68 +172,63 @@ const VerifyEmail = () => {
 
   return (
     <ScreenRoot>
-      <BackButtonWrapper>
-        <BackBtn
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          whileTap={{ scale: 0.90 }}
-          onClick={() => navigate(-1)}
-          variant="outlined"
-        >
-          <ArrowLeft size={17} color="rgba(255,255,255,0.80)" />
-        </BackBtn>
-      </BackButtonWrapper>
+      <FormCard>
+        <CardHeader>
+          <BackBtn initial={{ opacity: 0 }} animate={{ opacity: 1 }} whileTap={{ scale: 0.90 }} onClick={() => navigate(-1)} variant="outlined">
+            <ArrowLeft size={17} color="rgba(255,255,255,0.80)" />
+          </BackBtn>
+        </CardHeader>
+        <Body>
+          <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06, type: 'spring', stiffness: 300, damping: 28 }}>
+            <IconCircle>
+              <Mail size={24} color="#C8FF00" />
+            </IconCircle>
+            <Heading>Verify your email</Heading>
+            <Subtitle variant="body2">We sent a 6-digit code to</Subtitle>
+            <MaskedEmail>{maskedEmail}</MaskedEmail>
+          </motion.div>
 
-      <Body>
-        <motion.div initial={{ opacity: 0, y: -14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06, type: 'spring', stiffness: 300, damping: 28 }}>
-          <IconCircle>
-            <Mail size={24} color="#C8FF00" />
-          </IconCircle>
-          <Heading>Verify your email</Heading>
-          <Subtitle variant="body2">We sent a 6-digit code to</Subtitle>
-          <MaskedEmail>{maskedEmail}</MaskedEmail>
-        </motion.div>
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14 }}>
+            <OTPRow>
+              {digits.map((digit, i) => (
+                <OTPInput
+                  key={i}
+                  ref={(el: HTMLInputElement | null) => { inputRefs.current[i] = el }}
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={1}
+                  value={digit}
+                  filled={digit !== ''}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(i, e.target.value)}
+                  onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(i, e)}
+                  onPaste={(e: React.ClipboardEvent<HTMLInputElement>) => handlePaste(e)}
+                  onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.target.select()}
+                  autoFocus={i === 0}
+                />
+              ))}
+            </OTPRow>
 
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14 }}>
-          <OTPRow>
-            {digits.map((digit, i) => (
-              <OTPInput
-                key={i}
-                ref={(el: HTMLInputElement | null) => { inputRefs.current[i] = el }}
-                type="text"
-                inputMode="numeric"
-                maxLength={1}
-                value={digit}
-                filled={digit !== ''}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(i, e.target.value)}
-                onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => handleKeyDown(i, e)}
-                onPaste={(e: React.ClipboardEvent<HTMLInputElement>) => handlePaste(e)}
-                onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.target.select()}
-                autoFocus={i === 0}
-              />
-            ))}
-          </OTPRow>
-
-          <ResendRow>
-            <ResendText variant="caption">Didn't receive it?</ResendText>
-            {cooldown > 0 ? (
-              <CooldownText variant="caption">Resend ({cooldown}s)</CooldownText>
-            ) : (
-              <ResendLink
-                variant="text"
-                whileTap={{ scale: 0.95 }}
-                onClick={() => {
-                  setDigits(Array(OTP_LENGTH).fill(''))
-                  inputRefs.current[0]?.focus()
-                  resetCooldown()
-                }}
-              >
-                Resend code
-              </ResendLink>
-            )}
-          </ResendRow>
-        </motion.div>
-      </Body>
+            <ResendRow>
+              <ResendText variant="caption">Didn't receive it?</ResendText>
+              {cooldown > 0 ? (
+                <CooldownText variant="caption">Resend ({cooldown}s)</CooldownText>
+              ) : (
+                <ResendLink
+                  variant="text"
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => {
+                    setDigits(Array(OTP_LENGTH).fill(''))
+                    inputRefs.current[0]?.focus()
+                    resetCooldown()
+                  }}
+                >
+                  Resend code
+                </ResendLink>
+              )}
+            </ResendRow>
+          </motion.div>
+        </Body>
+      </FormCard>
     </ScreenRoot>
   )
 }

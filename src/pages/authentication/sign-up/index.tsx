@@ -13,15 +13,58 @@ const TOTAL = 6
 
 const MotionButton = motion.create(Button)
 
-const ScreenRoot = styled(Box)({ height: '100%', display: 'flex', flexDirection: 'column', paddingTop: '44px', position: 'relative' })
-const ScrollArea = styled(Box)({ flex: 1, overflowY: 'auto', padding: '20px 24px 0' })
+const ScreenRoot = styled(Box)(({ theme }) => ({
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  paddingTop: '44px',
+  position: 'relative',
+  [theme.breakpoints.up('md')]: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 0,
+  },
+}))
+
+const FormCard = styled(Box)(({ theme }) => ({
+  width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  flex: 1,
+  [theme.breakpoints.up('md')]: {
+    flex: 'unset',
+    width: '100%',
+    maxWidth: 460,
+    background: 'rgba(255,255,255,0.03)',
+    border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: 24,
+    padding: '40px',
+    backdropFilter: 'blur(16px)',
+    WebkitBackdropFilter: 'blur(16px)',
+  },
+}))
+
+const ScrollArea = styled(Box)(({ theme }) => ({
+  flex: 1,
+  overflowY: 'auto',
+  padding: '20px 24px 0',
+  [theme.breakpoints.up('md')]: {
+    overflowY: 'visible',
+    padding: 0,
+  },
+}))
 const HeadingText = styled(Typography)({ fontSize: 26, fontWeight: 800, letterSpacing: '-0.6px', marginBottom: '6px' })
 const SubText = styled(Typography)({ fontSize: 14, marginBottom: '24px' })
 const NameRow = styled(Box)({ display: 'flex', gap: '10px' })
 const PasswordErrorText = styled(Typography)({ color: 'rgba(255,80,80,0.9)', fontSize: 11.5, marginTop: '5px' })
 const LegalText = styled(Typography)({ color: 'rgba(255,255,255,0.28)', fontSize: 11.5, textAlign: 'center', paddingTop: '4px', paddingBottom: '4px' })
 const LegalLink = styled('span')(({ theme }) => ({ color: theme.palette.primary.main }))
-const FooterBox = styled(Box)({ padding: '20px 24px 48px' })
+const FooterBox = styled(Box)(({ theme }) => ({
+  padding: '20px 24px 48px',
+  [theme.breakpoints.up('md')]: {
+    padding: 0,
+  },
+}))
 const FieldLabelText = styled(Typography)({ color: 'rgba(255,255,255,0.48)', fontSize: 12, fontWeight: 600, letterSpacing: '0.2px', display: 'block', marginBottom: '8px' })
 const FieldRoot = styled(Box)({ flex: 1 })
 const FieldErrorText = styled(Typography)({ color: 'rgba(255,80,80,0.9)', fontSize: 11.5, marginTop: '5px' })
@@ -74,57 +117,64 @@ const SignUp = () => {
 
   return (
     <ScreenRoot>
-      <ProgressBar current={STEP} total={TOTAL} onBack={() => navigate(-1)} title="Create Account" />
+      <FormCard>
+        <ProgressBar
+          current={STEP}
+          total={TOTAL}
+          onBack={() => navigate(-1)}
+          title="Create Account"
+          sx={{ pt: { xs: '54px', md: 0 }, px: { xs: '20px', md: 0 }, pb: { xs: '16px', md: '24px' } }}
+        />
+        <ScrollArea>
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+            <HeadingText>Let's get you set up</HeadingText>
+            <SubText variant="body2">Takes under 3 minutes. We'll protect your data.</SubText>
+          </motion.div>
 
-      <ScrollArea>
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-          <HeadingText>Let's get you set up</HeadingText>
-          <SubText variant="body2">Takes under 3 minutes. We'll protect your data.</SubText>
+          <MotionFormFieldsColumn initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
+            <NameRow>
+              <Field label="First name" value={form.first} placeholder="Jane" onChange={v => setForm(f => ({ ...f, first: v }))} onBlur={() => touch('first')} error={touched.first ? errors.first : null} />
+              <Field label="Last name" value={form.last} placeholder="Smith" onChange={v => setForm(f => ({ ...f, last: v }))} onBlur={() => touch('last')} error={touched.last ? errors.last : null} />
+            </NameRow>
+            <Field label="Mobile number" value={form.phone} placeholder="+1 (555) 000-0000" type="tel" onChange={v => setForm(f => ({ ...f, phone: v }))} />
+            <Field label="Email address" value={form.email} placeholder="jane@email.com" type="email" onChange={v => setForm(f => ({ ...f, email: v }))} onBlur={() => touch('email')} error={touched.email ? errors.email : null} />
+
+            <Box>
+              <FieldLabelText>Password</FieldLabelText>
+              <TextField
+                fullWidth
+                type={showPass ? 'text' : 'password'}
+                placeholder="Min. 8 characters"
+                value={form.password}
+                onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+                onBlur={() => touch('password')}
+                slotProps={{
+                  input: {
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <PasswordIconButton onClick={() => setShowPass(s => !s)} edge="end">
+                          {showPass ? <EyeOff size={17} /> : <Eye size={17} />}
+                        </PasswordIconButton>
+                      </InputAdornment>
+                    ),
+                  },
+                }}
+              />
+              {touched.password && errors.password && <PasswordErrorText>{errors.password}</PasswordErrorText>}
+            </Box>
+
+            <LegalText>
+              By continuing you agree to our <LegalLink>Terms</LegalLink> &amp; <LegalLink>Privacy Policy</LegalLink>
+            </LegalText>
+          </MotionFormFieldsColumn>
+        </ScrollArea>
+
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
+          <FooterBox>
+            <PrimaryButton onClick={handleNext} label="Continue" disabled={!isValid} />
+          </FooterBox>
         </motion.div>
-
-        <MotionFormFieldsColumn initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
-          <NameRow>
-            <Field label="First name" value={form.first} placeholder="Jane" onChange={v => setForm(f => ({ ...f, first: v }))} onBlur={() => touch('first')} error={touched.first ? errors.first : null} />
-            <Field label="Last name" value={form.last} placeholder="Smith" onChange={v => setForm(f => ({ ...f, last: v }))} onBlur={() => touch('last')} error={touched.last ? errors.last : null} />
-          </NameRow>
-          <Field label="Mobile number" value={form.phone} placeholder="+1 (555) 000-0000" type="tel" onChange={v => setForm(f => ({ ...f, phone: v }))} />
-          <Field label="Email address" value={form.email} placeholder="jane@email.com" type="email" onChange={v => setForm(f => ({ ...f, email: v }))} onBlur={() => touch('email')} error={touched.email ? errors.email : null} />
-
-          <Box>
-            <FieldLabelText>Password</FieldLabelText>
-            <TextField
-              fullWidth
-              type={showPass ? 'text' : 'password'}
-              placeholder="Min. 8 characters"
-              value={form.password}
-              onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-              onBlur={() => touch('password')}
-              slotProps={{
-                input: {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <PasswordIconButton onClick={() => setShowPass(s => !s)} edge="end">
-                        {showPass ? <EyeOff size={17} /> : <Eye size={17} />}
-                      </PasswordIconButton>
-                    </InputAdornment>
-                  ),
-                },
-              }}
-            />
-            {touched.password && errors.password && <PasswordErrorText>{errors.password}</PasswordErrorText>}
-          </Box>
-
-          <LegalText>
-            By continuing you agree to our <LegalLink>Terms</LegalLink> &amp; <LegalLink>Privacy Policy</LegalLink>
-          </LegalText>
-        </MotionFormFieldsColumn>
-      </ScrollArea>
-
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
-        <FooterBox>
-          <PrimaryButton onClick={handleNext} label="Continue" disabled={!isValid} />
-        </FooterBox>
-      </motion.div>
+      </FormCard>
     </ScreenRoot>
   )
 }

@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { Box, Typography, Button } from '@mui/material'
 import { styled } from '@mui/material/styles'
+import type { SxProps, Theme } from '@mui/material'
 import { ArrowLeft } from 'lucide-react'
 
 const MotionButton = motion.create(Button)
@@ -36,14 +37,15 @@ interface ProgressBarProps {
   total:   number
   onBack:  () => void
   title:   string
+  sx?:     SxProps<Theme>
 }
 
-const ProgressBar = ({ current, total, onBack, title }: ProgressBarProps) => {
+const ProgressBar = ({ current, total, onBack, title, sx }: ProgressBarProps) => {
   const stepNumber = current + 1
   const pct = ((current + 1) / total) * 100
 
   return (
-    <Box sx={{ p: '12px 20px 16px', pt: '54px' }}>
+    <Box sx={[{ p: '12px 20px 16px', pt: '54px' }, ...(Array.isArray(sx) ? sx : [sx ?? {}])]}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: '12px', mb: '16px' }}>
         <BackButtonStyled
           whileTap={{ scale: 0.88 }}
