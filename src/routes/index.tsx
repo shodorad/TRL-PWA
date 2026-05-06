@@ -54,6 +54,7 @@ export const router = createBrowserRouter([
             children: [
               { index: true,                   element: <Navigate to="account" replace /> },
               { path: 'account',               element: load(() => import('@/pages/settings/account')) },
+              { path: 'my-orders',             element: load(() => import('@/pages/settings/my-orders')) },
               { path: 'vehicles',              element: load(() => import('@/pages/settings/vehicles')) },
               { path: 'alerts',                element: load(() => import('@/pages/settings/alerts')) },
               { path: 'device-management',     element: load(() => import('@/pages/settings/device-management')) },
