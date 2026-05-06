@@ -7,7 +7,7 @@ import { MapPin, Shield, Zap, Check } from 'lucide-react'
 import Car3D from '@/components/common/Car3D'
 import { GlassCard } from '@/components/common/GlassCard'
 import {
-  WelcomeRoot, CarouselWrapper, HeroRoot, HeroTitle, HeroSubtitle,
+  WelcomeRoot, LeftPanel, RightPanel, CarouselWrapper, HeroRoot, HeroTitle, HeroSubtitle,
   VehicleCountRow, VehicleIconBox, VehicleCountLabel,
   FeaturesRoot, FeaturesHeadingBox, SlideHeading, SlideCaption,
   FeatureIconBox, FeatureTitle, FeatureDesc,
@@ -170,45 +170,49 @@ const Welcome = () => {
 
   return (
     <WelcomeRoot>
-      <CarouselWrapper onMouseEnter={() => { if (timerRef.current) clearInterval(timerRef.current) }} onMouseLeave={startTimer}>
-        <AnimatePresence custom={dir} mode="wait" initial={false}>
-          <motion.div key={slide} custom={dir} variants={slideVariants} initial="enter" animate="center" exit="exit" transition={slideSpring} drag="x" dragConstraints={{ left: 0, right: 0 }} dragElastic={0.12} onDragEnd={handleDragEnd} style={{ position: 'absolute', inset: 0 }}>
-            {slide === 0 && <HeroSlide />}
-            {slide === 1 && <FeaturesSlide />}
-            {slide === 2 && <PricingSlide />}
+      <LeftPanel>
+        <CarouselWrapper onMouseEnter={() => { if (timerRef.current) clearInterval(timerRef.current) }} onMouseLeave={startTimer}>
+          <AnimatePresence custom={dir} mode="wait" initial={false}>
+            <motion.div key={slide} custom={dir} variants={slideVariants} initial="enter" animate="center" exit="exit" transition={slideSpring} drag="x" dragConstraints={{ left: 0, right: 0 }} dragElastic={0.12} onDragEnd={handleDragEnd} style={{ position: 'absolute', inset: 0 }}>
+              {slide === 0 && <HeroSlide />}
+              {slide === 1 && <FeaturesSlide />}
+              {slide === 2 && <PricingSlide />}
+            </motion.div>
+          </AnimatePresence>
+        </CarouselWrapper>
+
+        <DotsRow>
+          {Array.from({ length: TOTAL_SLIDES }).map((_, i) => (
+            <DotButton key={i} aria-label={`Go to slide ${i + 1}`} onClick={() => goToSlide(i)}>
+              <motion.div animate={{ width: i === slide ? 24 : 6, background: i === slide ? '#C8FF00' : 'rgba(255,255,255,0.20)' }} transition={{ type: 'spring', stiffness: 500, damping: 30 }} style={{ height: 6, borderRadius: 99 }} />
+            </DotButton>
+          ))}
+        </DotsRow>
+      </LeftPanel>
+
+      <RightPanel>
+        <CtaSection>
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+            <GetStartedButton fullWidth variant="contained" whileTap={{ scale: 0.97 }} onClick={() => navigate('/auth/sign-up')}>
+              Get Started →
+            </GetStartedButton>
           </motion.div>
-        </AnimatePresence>
-      </CarouselWrapper>
-
-      <DotsRow>
-        {Array.from({ length: TOTAL_SLIDES }).map((_, i) => (
-          <DotButton key={i} aria-label={`Go to slide ${i + 1}`} onClick={() => goToSlide(i)}>
-            <motion.div animate={{ width: i === slide ? 24 : 6, background: i === slide ? '#C8FF00' : 'rgba(255,255,255,0.20)' }} transition={{ type: 'spring', stiffness: 500, damping: 30 }} style={{ height: 6, borderRadius: 99 }} />
-          </DotButton>
-        ))}
-      </DotsRow>
-
-      <CtaSection>
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-          <GetStartedButton fullWidth variant="contained" whileTap={{ scale: 0.97 }} onClick={() => navigate('/auth/login')}>
-            Get Started →
-          </GetStartedButton>
-        </motion.div>
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.26 }}>
-          <ExploreButton fullWidth variant="outlined" whileTap={{ scale: 0.97 }} onClick={() => {
-            localStorage.setItem('accessToken', 'demo-token')
-            setToken('demo-token')
-            navigate('/')
-          }}>
-            Explore the app (skip onboarding) →
-          </ExploreButton>
-        </motion.div>
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.32 }}>
-          <SignInButton fullWidth variant="text" whileTap={{ scale: 0.97 }} onClick={() => navigate('/auth/sign-in')}>
-            Already have an account? <SignInHighlight component="span">Sign In</SignInHighlight>
-          </SignInButton>
-        </motion.div>
-      </CtaSection>
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.26 }}>
+            <ExploreButton fullWidth variant="outlined" whileTap={{ scale: 0.97 }} onClick={() => {
+              localStorage.setItem('accessToken', 'demo-token')
+              setToken('demo-token')
+              navigate('/')
+            }}>
+              Explore the app (skip onboarding) →
+            </ExploreButton>
+          </motion.div>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.32 }}>
+            <SignInButton fullWidth variant="text" whileTap={{ scale: 0.97 }} onClick={() => navigate('/auth/sign-in')}>
+              Already have an account? <SignInHighlight component="span">Sign In</SignInHighlight>
+            </SignInButton>
+          </motion.div>
+        </CtaSection>
+      </RightPanel>
     </WelcomeRoot>
   )
 }

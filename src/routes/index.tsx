@@ -31,7 +31,6 @@ export const router = createBrowserRouter([
   { path: '/onboarding/success',              element: load(() => import('@/pages/onboarding/success')) },
 
   // ── Auth (public) ────────────────────────────────────────
-  { path: '/auth/login',           element: load(() => import('@/pages/authentication/login')) },
   { path: '/auth/sign-up',         element: load(() => import('@/pages/authentication/sign-up')) },
   { path: '/auth/sign-in',         element: load(() => import('@/pages/authentication/sign-in')) },
   { path: '/auth/forgot-password', element: load(() => import('@/pages/authentication/forgot-password')) },
@@ -51,8 +50,9 @@ export const router = createBrowserRouter([
           { path: 'health',        element: load(() => import('@/pages/health')) },
           {
             path: 'settings',
+            element: load(() => import('@/pages/settings')),
             children: [
-              { index: true,                   element: <Navigate to="account" replace /> },
+              { index: true,                   element: null },
               { path: 'account',               element: load(() => import('@/pages/settings/account')) },
               { path: 'my-orders',             element: load(() => import('@/pages/settings/my-orders')) },
               { path: 'vehicles',              element: load(() => import('@/pages/settings/vehicles')) },
