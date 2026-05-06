@@ -19,7 +19,6 @@ export const router = createBrowserRouter([
   // ── Onboarding (public) ──────────────────────────────────
   { path: '/onboarding/welcome',              element: load(() => import('@/pages/onboarding/welcome')) },
   { path: '/onboarding/choose-plan',          element: load(() => import('@/pages/onboarding/choose-plan')) },
-  { path: '/onboarding/select-device',        element: load(() => import('@/pages/onboarding/select-device')) },
   { path: '/onboarding/payment',                    element: load(() => import('@/pages/onboarding/payment')) },
   { path: '/onboarding/order-tracking',             element: load(() => import('@/pages/onboarding/order-tracking')) },
   { path: '/onboarding/device-purchase-details',    element: load(() => import('@/pages/onboarding/device-purchase-details')) },
