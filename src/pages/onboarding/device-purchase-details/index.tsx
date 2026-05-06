@@ -158,7 +158,7 @@ const DevicePurchaseDetails = () => {
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.52 }}>
         <FooterArea>
-          <PrimaryButton onClick={() => navigate('/onboarding/add-vehicle')} label="Activate My Device" />
+          <PrimaryButton onClick={() => {}} label="Acknowledge My Order" />
           <ReceiptLink>
             <ExternalLink size={13} />
             View Receipt Email

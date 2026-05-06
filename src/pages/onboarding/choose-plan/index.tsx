@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { styled } from '@mui/material/styles'
-import { Box, Typography } from '@mui/material'
-import { Check, Zap, Shield, MapPin, Building2, Truck } from 'lucide-react'
+import { Box } from '@mui/material'
+import { Check, MapPin, Building2, Truck, Minus, Plus } from 'lucide-react'
 import ProgressBar from '@/components/common/ProgressBar'
 import PrimaryButton from '@/components/common/PrimaryButton'
 import { glassCard } from '@/styles/glass'
@@ -14,6 +14,12 @@ import { colors } from '@/styles/tokens'
 
 const STEP = 1
 const TOTAL = 10
+
+const PLAN_DEFAULT_DEVICES: Record<PlanTier, number> = {
+  personal: 1,
+  business: 5,
+  fleet: 20,
+}
 
 // ── Pricing ──────────────────────────────────────────────────
 const PLANS: {
@@ -95,11 +101,23 @@ const FeatureText     = styled('span')({ color: 'rgba(255,255,255,0.68)', fontSi
 const LegalNote       = styled('p')({ color: 'rgba(255,255,255,0.22)', fontSize: 11, textAlign: 'center', lineHeight: 1.7, marginBottom: 8, fontFamily: 'Inter, sans-serif' })
 const FooterArea      = styled('div')({ padding: '14px 24px 48px' })
 
-const PlanCard = ({ plan, selected, annual, onSelect }: {
+// ── Device stepper (inside card) ──────────────────────────────
+const DeviceStepperRow  = styled('div')({ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, padding: '10px 14px', marginTop: 14 })
+const DeviceStepperLeft = styled('div')({ display: 'flex', flexDirection: 'column', gap: 2 })
+const DeviceStepperLabel = styled('span')({ fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.85)', fontFamily: 'Inter, sans-serif' })
+const DeviceStepperSub  = styled('span')({ fontSize: 10.5, color: 'rgba(255,255,255,0.32)', fontFamily: 'Inter, sans-serif' })
+const StepperWrap       = styled('div')({ display: 'flex', alignItems: 'center', gap: 12 })
+const StepperBtn        = styled('button')<{ disabled?: boolean }>(({ disabled }) => ({ width: 28, height: 28, borderRadius: 8, border: '1px solid rgba(255,255,255,0.14)', background: 'rgba(255,255,255,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.3 : 1, transition: 'opacity 0.15s, background 0.15s', '&:active': { background: disabled ? undefined : 'rgba(200,255,0,0.12)' } }))
+const StepperCount      = styled('span')({ fontSize: 16, fontWeight: 800, color: '#C8FF00', minWidth: 20, textAlign: 'center', fontFamily: 'Inter, sans-serif', letterSpacing: '-0.5px' })
+
+// ── Sub-components ────────────────────────────────────────────
+const PlanCard = ({ plan, selected, annual, deviceCount, onSelect, onDeviceChange }: {
   plan: typeof PLANS[0]
   selected: boolean
   annual: boolean
+  deviceCount: number
   onSelect: () => void
+  onDeviceChange: (count: number) => void
 }) => {
   const price = annual ? plan.annual : plan.monthly
   const Icon = plan.icon
@@ -146,6 +164,39 @@ const PlanCard = ({ plan, selected, annual, onSelect }: {
             </FeatureRow>
           ))}
         </FeatureList>
+
+        <AnimatePresence>
+          {selected && (
+            <motion.div
+              initial={{ opacity: 0, height: 0, marginTop: 0 }}
+              animate={{ opacity: 1, height: 'auto', marginTop: 0 }}
+              exit={{ opacity: 0, height: 0, marginTop: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={e => e.stopPropagation()}
+            >
+              <DeviceStepperRow>
+                <DeviceStepperLeft>
+                  <DeviceStepperLabel>Number of devices</DeviceStepperLabel>
+                  <DeviceStepperSub>TrackLynk OBD-II — $49.99 each</DeviceStepperSub>
+                </DeviceStepperLeft>
+                <StepperWrap>
+                  <StepperBtn
+                    disabled={deviceCount <= 1}
+                    onClick={() => onDeviceChange(Math.max(1, deviceCount - 1))}
+                  >
+                    <Minus size={13} color={deviceCount <= 1 ? 'rgba(255,255,255,0.3)' : '#fff'} strokeWidth={2.5} />
+                  </StepperBtn>
+                  <motion.span key={deviceCount} initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ duration: 0.12 }}>
+                    <StepperCount>{deviceCount}</StepperCount>
+                  </motion.span>
+                  <StepperBtn onClick={() => onDeviceChange(deviceCount + 1)}>
+                    <Plus size={13} color="#C8FF00" strokeWidth={2.5} />
+                  </StepperBtn>
+                </StepperWrap>
+              </DeviceStepperRow>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </PlanCardWrapper>
     </motion.div>
   )
@@ -156,13 +207,14 @@ const ChoosePlan = () => {
   const { setPlan } = usePlan()
   const [annual, setAnnual] = useState(false)
   const [selectedTier, setSelectedTier] = useState<PlanTier>('personal')
+  const [deviceCount, setDeviceCount] = useState(PLAN_DEFAULT_DEVICES['personal'])
 
   const selected = PLANS.find(p => p.tier === selectedTier)!
   const price = annual ? selected.annual : selected.monthly
 
   const handleNext = () => {
-    setPlan({ tier: selectedTier, type: annual ? 'annual' : 'monthly', price, deviceOrdered: false })
-    navigate('/onboarding/select-device')
+    setPlan({ tier: selectedTier, type: annual ? 'annual' : 'monthly', price, deviceOrdered: true })
+    navigate('/onboarding/payment')
   }
 
   return (
@@ -195,7 +247,9 @@ const ChoosePlan = () => {
               plan={plan}
               selected={selectedTier === plan.tier}
               annual={annual}
-              onSelect={() => setSelectedTier(plan.tier)}
+              deviceCount={selectedTier === plan.tier ? deviceCount : PLAN_DEFAULT_DEVICES[plan.tier]}
+              onSelect={() => { setSelectedTier(plan.tier); setDeviceCount(PLAN_DEFAULT_DEVICES[plan.tier]) }}
+              onDeviceChange={setDeviceCount}
             />
           ))}
         </motion.div>

@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@/contexts/AuthContext'
 import { motion, AnimatePresence } from 'framer-motion'
 import { styled } from '@mui/material/styles'
 import { Box, Typography, Button } from '@mui/material'
@@ -48,8 +49,14 @@ const ActivePulse = () => (
 
 const OrderTracking = () => {
   const navigate = useNavigate()
+  const { setToken } = useAuth()
 
   const goNext = () => navigate('/onboarding/device-purchase-details')
+  const goToDashboard = () => {
+    localStorage.setItem('accessToken', 'onboarding-complete')
+    setToken('onboarding-complete')
+    navigate('/')
+  }
 
   return (
     <ScreenRoot>
@@ -139,8 +146,8 @@ const OrderTracking = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.06 }}
             >
-              <SecondaryBtn fullWidth variant="outlined" whileTap={{ scale: 0.97 }} onClick={goNext}>
-                Set Up Device Now
+              <SecondaryBtn fullWidth variant="outlined" whileTap={{ scale: 0.97 }} onClick={goToDashboard}>
+                Go to Dashboard
               </SecondaryBtn>
             </motion.div>
           </AnimatePresence>
