@@ -1,21 +1,31 @@
-import axiosInstance from './axiosInstance'
+import { AxiosError } from 'axios';
+import axiosInstance from './axiosInstance';
+import { LoginUrlConstants } from '../components/common/constants/urlConstants';
 
-export const login = async (email: string, password: string) => {
-  const { data } = await axiosInstance.post('/auth/login', { email, password })
-  return data
+export interface LoginPayload {
+    email: string;
+    password: string;
 }
 
-export const register = async (email: string, password: string, name: string) => {
-  const { data } = await axiosInstance.post('/auth/register', { email, password, name })
-  return data
+export const loginUser = async (payload: LoginPayload): Promise<any> => {
+    try {
+        const response = await axiosInstance.post<any>(`${LoginUrlConstants.LOGIN}`, payload);
+        return response.data;
+    } catch (error: AxiosError | any) {
+        throw error.response?.data?.message || "Login failed. Please try again.";
+    }
 }
 
-export const logout = async () => {
-  const { data } = await axiosInstance.post('/auth/logout')
-  return data
+export interface GoogleAuthPayload {
+    idToken: string;
+    intendedRole: string;
 }
 
-export const registerPushToken = async (token: string) => {
-  const { data } = await axiosInstance.post('/auth/push-token', { token })
-  return data
+export const googleAuth = async (payload: GoogleAuthPayload): Promise<any> => {
+    try {
+        const response = await axiosInstance.post<any>(`${LoginUrlConstants.GOOGLE_AUTH}`, payload);
+        return response.data;
+    } catch (error: AxiosError | any) {
+        throw error.response?.data?.message || "Google sign-in failed. Please try again.";
+    }
 }

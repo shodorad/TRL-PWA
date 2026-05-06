@@ -5,6 +5,8 @@ import { Box, Typography, Button, TextField, InputAdornment, IconButton } from '
 import { styled } from '@mui/material/styles'
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react'
 import PrimaryButton from '@/components/common/PrimaryButton'
+import { loginUser } from '@/services/authService'
+import { useAuth } from '@/contexts/AuthContext'
 
 const MotionButton = motion.create(Button)
 
@@ -96,10 +98,13 @@ const GoogleIcon = () => (
 
 const SignIn = () => {
   const navigate = useNavigate()
+  const { setToken, setUser } = useAuth()
   const [showPass, setShowPass] = useState(false)
   const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
   const [touched, setTouched]   = useState<Record<string, boolean>>({})
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const errors = {
     email:    !emailRe.test(email) ? 'Enter a valid email' : null,
@@ -109,9 +114,23 @@ const SignIn = () => {
 
   const touch = (key: string) => setTouched(t => ({ ...t, [key]: true }))
 
-  const handleSignIn = () => {
-    if (!isValid) return
-    navigate('/')
+  const handleSignIn = async () => {
+    if (!isValid || submitting) return
+    setSubmitting(true)
+    setSubmitError(null)
+    try {
+      const data = await loginUser({ email, password })
+      const accessToken = data?.data?.accessToken ?? data?.accessToken ?? data?.token
+      if (!accessToken) throw 'Invalid response from server.'
+      localStorage.setItem('accessToken', accessToken)
+      setToken(accessToken)
+      if (data?.user) setUser(data.user)
+      navigate('/')
+    } catch (err: any) {
+      setSubmitError(typeof err === 'string' ? err : 'Sign in failed. Please try again.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -177,7 +196,8 @@ const SignIn = () => {
               </Box>
             </FieldsGroup>
 
-            <PrimaryButton onClick={handleSignIn} label="Sign in" disabled={!isValid} />
+            <PrimaryButton onClick={handleSignIn} label={submitting ? 'Signing in...' : 'Sign in'} disabled={!isValid || submitting} />
+            {submitError && <ErrorText sx={{ mt: 1, textAlign: 'center' }}>{submitError}</ErrorText>}
 
             <DividerRow sx={{ mt: 3 }}>
               <DividerLine /><DividerLabel variant="caption">or continue with</DividerLabel><DividerLine />

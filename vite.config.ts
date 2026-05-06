@@ -12,10 +12,14 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      devOptions: {
+        enabled: true
+      },
       includeAssets: ['car-3d.png', 'icons/*.png'],
       manifest: false,
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
         runtimeCaching: [
           {
             urlPattern: /\/api\//,
@@ -39,5 +43,13 @@ export default defineConfig({
         replacement: SRC_PATH,
       },
     ],
+  },
+  server: {
+    open: true,
+    port: 3000
+  },
+  preview: {
+    open: true,
+    port: 3000
   },
 })
