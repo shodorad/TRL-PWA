@@ -77,8 +77,7 @@ const ScrollArea      = styled('div')({ flex: 1, overflowY: 'auto', padding: '16
 const Heading         = styled('h2')({ fontSize: 26, fontWeight: 800, color: '#fff', marginBottom: 6, letterSpacing: '-0.6px', fontFamily: 'Inter, sans-serif' })
 const SubHeading      = styled('p')({ color: 'rgba(255,255,255,0.42)', fontSize: 14, marginBottom: 20, fontFamily: 'Inter, sans-serif' })
 const ToggleWrapper   = styled('div')({ display: 'flex', background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 14, padding: 4, marginBottom: 20, position: 'relative' })
-const ToggleIndicator = styled('div')({ position: 'absolute', top: 4, bottom: 4, width: 'calc(50% - 4px)', background: 'rgba(200,255,0,0.14)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', borderRadius: 10, border: '1px solid rgba(200,255,0,0.28)', boxShadow: '0 0 12px rgba(200,255,0,0.1)' })
-const ToggleButton    = styled('button')<{ active?: boolean }>(({ active }) => ({ flex: 1, padding: '9px 0', background: 'none', border: 'none', color: active ? '#C8FF00' : 'rgba(255,255,255,0.42)', fontSize: 13, fontWeight: 600, cursor: 'pointer', position: 'relative', zIndex: 1, fontFamily: 'Inter, sans-serif', transition: 'color 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }))
+const ToggleButton    = styled('button')<{ active?: boolean }>(({ active }) => ({ flex: 1, padding: '9px 8px', background: 'none', border: 'none', color: active ? '#C8FF00' : 'rgba(255,255,255,0.42)', fontSize: 13, fontWeight: 600, cursor: 'pointer', position: 'relative', zIndex: 1, fontFamily: 'Inter, sans-serif', transition: 'color 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, borderRadius: 10 }))
 const SaveBadge       = styled('span')({ fontSize: 10, background: 'rgba(74,222,128,0.15)', color: '#4ade80', padding: '2px 7px', borderRadius: 99, fontWeight: 700, border: '1px solid rgba(74,222,128,0.2)' })
 const PlanCardWrapper = styled('div')<{ selected: boolean }>(({ selected }) => ({ ...glassCard, padding: '18px', marginBottom: 12, cursor: 'pointer', border: selected ? '1.5px solid rgba(200,255,0,0.55)' : '1px solid rgba(255,255,255,0.10)', background: selected ? 'rgba(200,255,0,0.05)' : 'rgba(255,255,255,0.055)', boxShadow: selected ? '0 0 24px rgba(200,255,0,0.08), 0 8px 32px rgba(0,0,0,0.55)' : '0 8px 32px rgba(0,0,0,0.55)', transition: 'border-color 0.2s, background 0.2s, box-shadow 0.2s', position: 'relative', overflow: 'hidden' }))
 const CardTopRow      = styled('div')({ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 12 })
@@ -177,11 +176,15 @@ const ChoosePlan = () => {
 
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}>
           <ToggleWrapper>
-            <motion.div animate={{ x: annual ? '100%' : 0 }} transition={{ type: 'spring', stiffness: 400, damping: 30 }} style={{ position: 'absolute', top: 4, bottom: 4, width: 'calc(50% - 4px)' }}>
-              <ToggleIndicator />
-            </motion.div>
-            {['Monthly', 'Annual'].map((label, i) => (
+            {(['Monthly', 'Annual'] as const).map((label, i) => (
               <ToggleButton key={label} active={(i === 1) === annual} onClick={() => setAnnual(i === 1)}>
+                {(i === 1) === annual && (
+                  <motion.div
+                    layoutId="billing-tab"
+                    style={{ position: 'absolute', inset: 0, background: 'rgba(200,255,0,0.14)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', borderRadius: 10, border: '1px solid rgba(200,255,0,0.28)', boxShadow: '0 0 12px rgba(200,255,0,0.1)' }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  />
+                )}
                 {label}{i === 1 && <SaveBadge>Save up to 20%</SaveBadge>}
               </ToggleButton>
             ))}

@@ -73,6 +73,7 @@ const Payment = () => {
 
   const [payMethod, setPayMethod] = useState<PayMethod>('card')
   const [card, setCard]           = useState({ number: '', expiry: '', cvv: '', name: '' })
+  const [addr, setAddr]           = useState({ line1: '', line2: '', city: '', state: '', zip: '', country: 'US' })
   const [focused, setFocused]     = useState<string | null>(null)
   const [promoOpen, setPromoOpen] = useState(false)
   const [promo, setPromo]         = useState('')
@@ -85,10 +86,14 @@ const Payment = () => {
 
   const cardDigits = card.number.replace(/\s/g, '')
   const errors = {
-    number: cardDigits.length < 16 ? 'Enter a valid 16-digit card number' : null,
-    expiry: card.expiry.length < 5 ? 'Enter MM/YY' : null,
-    cvv:    card.cvv.length < 3    ? 'Enter 3 or 4 digits'               : null,
-    name:   !card.name.trim()      ? 'Required'                          : null,
+    number:    cardDigits.length < 16 ? 'Enter a valid 16-digit card number' : null,
+    expiry:    card.expiry.length < 5 ? 'Enter MM/YY' : null,
+    cvv:       card.cvv.length < 3    ? 'Enter 3 or 4 digits'               : null,
+    name:      !card.name.trim()      ? 'Required'                          : null,
+    addrLine1: !addr.line1.trim()     ? 'Required'                          : null,
+    addrCity:  !addr.city.trim()      ? 'Required'                          : null,
+    addrState: !addr.state.trim()     ? 'Required'                          : null,
+    addrZip:   !/^\d{5}(-\d{4})?$/.test(addr.zip.trim()) ? 'Enter a valid ZIP' : null,
   }
   const isValid = Object.values(errors).every(e => e === null)
 
@@ -104,10 +109,10 @@ const Payment = () => {
   })
 
   const handlePay = () => {
-    if (payMethod === 'card') {
-      setTouched({ number: true, expiry: true, cvv: true, name: true })
-      if (!isValid) return
-    }
+    const allTouched: Record<string, boolean> = { addrLine1: true, addrCity: true, addrState: true, addrZip: true }
+    if (payMethod === 'card') Object.assign(allTouched, { number: true, expiry: true, cvv: true, name: true })
+    setTouched(allTouched)
+    if (!isValid) return
     // Only show order-tracking when a device was ordered
     navigate(plan?.deviceOrdered ? '/onboarding/order-tracking' : '/onboarding/device-purchase-details')
   }
@@ -250,6 +255,75 @@ const Payment = () => {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Shipping address */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.24 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+            <FieldLabel sx={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.65)', letterSpacing: '0.1px', mb: 0 }}>Shipping Address</FieldLabel>
+
+            {/* Grouped container */}
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '16px', padding: '16px' }}>
+              {/* Address line 1 */}
+              <Box>
+                <FieldLabel>Address Line 1</FieldLabel>
+                <TextField
+                  fullWidth placeholder="123 Main St" value={addr.line1} autoCapitalize="words"
+                  onChange={e => setAddr(a => ({ ...a, line1: e.target.value }))}
+                  onFocus={() => setFocused('addrLine1')} onBlur={() => { setFocused(null); touch('addrLine1') }}
+                  sx={fieldStyle('addrLine1')}
+                />
+                {touched.addrLine1 && errors.addrLine1 && <ErrorText>{errors.addrLine1}</ErrorText>}
+              </Box>
+
+              {/* Address line 2 */}
+              <Box>
+                <FieldLabel>Address Line 2 <span style={{ color: 'rgba(255,255,255,0.22)', fontSize: 11 }}>(optional)</span></FieldLabel>
+                <TextField
+                  fullWidth placeholder="Apt, suite, unit…" value={addr.line2} autoCapitalize="words"
+                  onChange={e => setAddr(a => ({ ...a, line2: e.target.value }))}
+                  onFocus={() => setFocused('addrLine2')} onBlur={() => setFocused(null)}
+                  sx={fieldStyle('addrLine2')}
+                />
+              </Box>
+
+              {/* City + State */}
+              <SplitRow>
+                <Box sx={{ flex: 2 }}>
+                  <FieldLabel>City</FieldLabel>
+                  <TextField
+                    fullWidth placeholder="New York" value={addr.city} autoCapitalize="words"
+                    onChange={e => setAddr(a => ({ ...a, city: e.target.value }))}
+                    onFocus={() => setFocused('addrCity')} onBlur={() => { setFocused(null); touch('addrCity') }}
+                    sx={fieldStyle('addrCity')}
+                  />
+                  {touched.addrCity && errors.addrCity && <ErrorText>{errors.addrCity}</ErrorText>}
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  <FieldLabel>State</FieldLabel>
+                  <TextField
+                    fullWidth placeholder="NY" value={addr.state} inputProps={{ maxLength: 2 }}
+                    onChange={e => setAddr(a => ({ ...a, state: e.target.value.toUpperCase().replace(/[^A-Z]/g, '') }))}
+                    onFocus={() => setFocused('addrState')} onBlur={() => { setFocused(null); touch('addrState') }}
+                    sx={fieldStyle('addrState')}
+                  />
+                  {touched.addrState && errors.addrState && <ErrorText>{errors.addrState}</ErrorText>}
+                </Box>
+              </SplitRow>
+
+              {/* ZIP */}
+              <Box>
+                <FieldLabel>ZIP Code</FieldLabel>
+                <TextField
+                  fullWidth placeholder="10001" value={addr.zip} inputMode="numeric"
+                  onChange={e => setAddr(a => ({ ...a, zip: e.target.value.replace(/[^\d-]/g, '').slice(0, 10) }))}
+                  onFocus={() => setFocused('addrZip')} onBlur={() => { setFocused(null); touch('addrZip') }}
+                  sx={fieldStyle('addrZip')}
+                />
+                {touched.addrZip && errors.addrZip && <ErrorText>{errors.addrZip}</ErrorText>}
+              </Box>
+            </Box>
+          </Box>
+        </motion.div>
 
         {/* Promo code */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.32 }}>

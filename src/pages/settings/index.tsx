@@ -2,10 +2,11 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { Box, Typography, List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { motion } from 'framer-motion'
-import { User, Car, Bell, Cpu, CreditCard, FileText, LifeBuoy, Info, ChevronRight } from 'lucide-react'
+import { User, Car, Bell, Cpu, CreditCard, FileText, LifeBuoy, Info, ChevronRight, ShoppingBag } from 'lucide-react'
 
 const SETTINGS_NAV = [
-  { path: 'account',           label: 'Account',           icon: User,       iconBg: 'rgba(200,255,0,0.10)' },
+  { path: 'account',           label: 'Account',           icon: User,        iconBg: 'rgba(200,255,0,0.10)' },
+  { path: 'my-orders',         label: 'My Orders',         icon: ShoppingBag, iconBg: 'rgba(74,222,128,0.10)' },
   { path: 'vehicles',          label: 'Vehicles',           icon: Car,        iconBg: 'rgba(200,255,0,0.10)' },
   { path: 'alerts',            label: 'Alerts',             icon: Bell,       iconBg: 'rgba(250,204,21,0.10)' },
   { path: 'device-management', label: 'Device Management',  icon: Cpu,        iconBg: 'rgba(200,255,0,0.10)' },
