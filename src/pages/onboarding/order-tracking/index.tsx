@@ -49,7 +49,9 @@ const ActivePulse = () => (
 const OrderTracking = () => {
   const navigate = useNavigate()
 
-  const goNext = () => navigate('/onboarding/device-purchase-details')
+  const goToPurchaseDetails = () => navigate('/onboarding/device-purchase-details')
+  const goToSetup = () => navigate('/onboarding/add-vehicle')
+  const goToDashboard = () => navigate('/')
 
   return (
     <ScreenRoot>
@@ -132,15 +134,24 @@ const OrderTracking = () => {
       {/* CTAs */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
         <FooterArea>
-          <PrimaryButton onClick={goNext} label="View Purchase Details" />
+          <MotionButton
+            fullWidth
+            variant="text"
+            whileTap={{ scale: 0.97 }}
+            onClick={goToPurchaseDetails}
+            sx={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.42)', textDecoration: 'underline', textDecorationColor: 'rgba(255,255,255,0.2)', textUnderlineOffset: '3px' }}
+          >
+            View Purchase Details
+          </MotionButton>
+          <PrimaryButton onClick={goToSetup} label="Set Up Vehicle / Device" />
           <AnimatePresence>
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.06 }}
             >
-              <SecondaryBtn fullWidth variant="outlined" whileTap={{ scale: 0.97 }} onClick={goNext}>
-                Set Up Device Now
+              <SecondaryBtn fullWidth variant="outlined" whileTap={{ scale: 0.97 }} onClick={goToDashboard}>
+                Go to Dashboard
               </SecondaryBtn>
             </motion.div>
           </AnimatePresence>

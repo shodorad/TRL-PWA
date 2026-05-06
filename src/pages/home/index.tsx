@@ -4,9 +4,10 @@ import { Box, Typography, Button } from '@mui/material'
 import { styled } from '@mui/material/styles'
 import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api'
 import { useVehicle } from '@/contexts/VehicleContext'
-import { Avatar } from '@/components'
+import { Avatar, NotificationBanner } from '@/components'
 import { DARK_MAP_STYLES } from '@/styles/mapStyles'
 import { ChevronDown, Bell, Zap, LocateFixed } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 const ROUTE_PATH = [
   { lat: 40.7484, lng: -73.9967 },
@@ -51,6 +52,8 @@ const GoButton            = styled(Button)({ minWidth: 0, width: 42, height: 42,
 const MotionGoButton      = motion.create(GoButton)
 const RecenterButton      = styled(Button)({ position: 'absolute', bottom: 90, right: 16, minWidth: 0, width: 36, height: 36, borderRadius: '50%', padding: 0, backgroundColor: 'rgba(12,15,22,0.88)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', zIndex: 30, boxShadow: '0 4px 14px rgba(0,0,0,0.5)' })
 const MotionRecenterButton = motion.create(RecenterButton)
+
+const NotificationTray    = styled(Box)({ position: 'absolute', bottom: 84, left: 12, right: 12, zIndex: 25, display: 'flex', flexDirection: 'column', gap: 8, pointerEvents: 'auto' })
 
 const MapView = () => {
   const mapRef      = useRef<google.maps.Map | null>(null)
@@ -126,16 +129,38 @@ const TripInfoCard = () => (
   </MotionTripCardShell>
 )
 
-const Home = () => (
-  <HomeRoot>
-    <MapContainer><MapView /></MapContainer>
-    <TopGradient />
-    <FloatingHeader />
-    <TripInfoCard />
-    <MotionRecenterButton whileTap={{ scale: 0.90 }} variant="outlined">
-      <LocateFixed size={15} color="#C8FF00" />
-    </MotionRecenterButton>
-  </HomeRoot>
-)
+const Home = () => {
+  const navigate = useNavigate()
+  const [acknowledged, setAcknowledged] = useState(false)
+
+  return (
+    <HomeRoot>
+      <MapContainer><MapView /></MapContainer>
+      <TopGradient />
+      <FloatingHeader />
+      <TripInfoCard />
+
+      <NotificationTray>
+        <NotificationBanner variant="order_in_progress" />
+        {!acknowledged && (
+          <NotificationBanner
+            variant="order_delivered"
+            onAcknowledge={() => setAcknowledged(true)}
+            onSetupDevice={() => navigate('/onboarding/scan-device')}
+          />
+        )}
+        <NotificationBanner
+          variant="devices_delivered"
+          deviceCount={2}
+          onPairVehicles={() => navigate('/onboarding/vehicle-details')}
+        />
+      </NotificationTray>
+
+      <MotionRecenterButton whileTap={{ scale: 0.90 }} variant="outlined">
+        <LocateFixed size={15} color="#C8FF00" />
+      </MotionRecenterButton>
+    </HomeRoot>
+  )
+}
 
 export default Home
